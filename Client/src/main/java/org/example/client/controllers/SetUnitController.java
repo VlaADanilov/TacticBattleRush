@@ -34,6 +34,12 @@ public class SetUnitController {
     private int choice;
 
     public void initialize() {
+        heavyKnightImage.setImage(new Image(this.getClass().getResourceAsStream("/image/меч.jpg")));
+        archerImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лук.png")));
+        hillerImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лечение.png")));
+        horseKnightImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лошадь.png")));
+
+        submitButton.setDisable(true);
         for(int i = 0; i < gridPane.getRowCount(); i++){
             for(int j = 0; j < gridPane.getColumnCount(); j++){
                 Pane pane = new Pane();
@@ -41,18 +47,22 @@ public class SetUnitController {
                 int finalJ = j;
                 int finalI = i;
                 pane.setOnMouseClicked((event -> {
-                    if(choice != 0 && cnt < 3){
-                        String style = pane.getStyle();
-                        if(!BoardSingleton.getInstance().checkForNull(finalJ,finalI)){
-                            BoardSingleton.getInstance().removeMySoldier(finalJ, finalI);
-                            cnt--;
-                            pane.setStyle("-fx-border-color: black; -fx-border-width: 2;");
-                            submitButton.setDisable(true);
-                        }else{
-                            BoardSingleton.getInstance().addMySoldier(SoldierFabrica.getSoldier(choice),finalJ, finalI);
-                            pane.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-background-color: blue;");
+                    BoardSingleton instance = BoardSingleton.getInstance();
+                    if(choice != 0 && cnt <= 3 && !BoardSingleton.getInstance().checkForNull(finalJ,finalI)){
+                        BoardSingleton.getInstance().removeMySoldier(finalJ, finalI);
+                        cnt--;
+                        pane.getChildren().clear();
+                        submitButton.setDisable(true);
+                    }
+                    else {
+                        if (choice != 0 && cnt < 3 && BoardSingleton.getInstance().checkForNull(finalJ, finalI)) {
+                            BoardSingleton.getInstance().addMySoldier(SoldierFabrica.getSoldier(choice), finalJ, finalI);
+                            ImageView imageView = new ImageView(getImageSoldier(choice));
+                            imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
+                            imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
+                            pane.getChildren().add(imageView);
                             cnt++;
-                            if(cnt == 3){
+                            if (cnt == 3) {
                                 submitButton.setDisable(false);
                             }
                         }
@@ -80,18 +90,6 @@ public class SetUnitController {
             pane.getChildren().add(imageView);
 
         }
-
-
-
-
-        heavyKnightImage.setImage(new Image(this.getClass().getResourceAsStream("/image/меч.jpg")));
-        archerImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лук.png")));
-        hillerImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лечение.png")));
-        horseKnightImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лошадь.png")));
-
-        submitButton.setDisable(true);
-        
-        
     }
 
     public void choiseHeavyKinght(MouseEvent mouseEvent) {
@@ -129,5 +127,15 @@ public class SetUnitController {
     public void next(ActionEvent actionEvent) {
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
         int i = 0;
+    }
+
+    private Image getImageSoldier(int i){
+        return switch(i){
+            case 1 -> heavyKnightImage.getImage();
+            case 2 -> archerImage.getImage();
+            case 3 -> hillerImage.getImage();
+            case 4 -> horseKnightImage.getImage();
+            default -> throw new IllegalStateException("Unexpected value: " + i);
+        };
     }
 }

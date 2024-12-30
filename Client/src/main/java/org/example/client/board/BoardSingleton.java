@@ -19,7 +19,7 @@ public class BoardSingleton {
     }
 
     public void addElement(AbstractElement element, int y, int x) {
-        board[y][x] = element;
+        board[x][y] = element;
     }
 
     public void addMySoldier(AbstractSoldier soldier, int y, int x) {
@@ -27,7 +27,7 @@ public class BoardSingleton {
     }
 
     public void removeMySoldier(int y, int x){
-        board[y][x] = null;
+        board[x][y] = null;
     }
 
     public boolean checkForNull(int y, int x){
