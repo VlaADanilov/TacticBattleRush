@@ -1,30 +1,21 @@
 package org.example.server.gameHandler;
 
+import org.example.GameEntities.AbstractEntity;
+import org.example.GameEntities.fabrica.ElementFabrica;
+
+import java.util.Random;
+
 public abstract class AbstractGameHandler implements GameHandlerInterface{
-    protected int[][] opponentOneBoard;
-    protected int[][] opponentTwoBoard;
+    protected AbstractEntity[][] board;
 
-    protected void initializeBoards(){
-        opponentOneBoard = new int[10][10];
-        opponentTwoBoard = new int[10][10];
-        fillBoards();
-    }
+    protected void initBoard(){
+        board = new AbstractEntity[15][15];
 
-    //1 - пусто, 2 - корабль, 3 - сюда стреляли
-    private void fillBoards(){
-        for(int i = 0; i < 10; i++){
-            for(int j = 0; j < 10; j++){
-                opponentOneBoard[i][j] = 1;
-                opponentTwoBoard[i][j] = 1;
-            }
+        Random rand = new Random();
+        for(int i = 0; i< rand.nextInt(13); i++){
+            int x = rand.nextInt(15);
+            int y = rand.nextInt(15);
+            board[y][x] = ElementFabrica.getElement();
         }
-    }
-
-    public int[][] getOpponentOneBoard() {
-        return opponentOneBoard;
-    }
-
-    public int[][] getOpponentTwoBoard() {
-        return opponentTwoBoard;
     }
 }
