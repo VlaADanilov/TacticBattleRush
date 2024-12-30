@@ -3,6 +3,7 @@ package org.example.client.GameEntities.soldiers;
 public class Archer extends AbstractSoldier{
 
     public Archer() {
+        super(2);
         health=6;
         damage=3;
         movementradius=3;
