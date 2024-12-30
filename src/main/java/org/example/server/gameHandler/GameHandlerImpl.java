@@ -30,30 +30,16 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         this.server = serverExample;
         hod = 1;
 
-        initBoard();
+        Byte[] elementsCoordinats = initBoard();
 
-        sendStartMessage();
+        sendStartMessage(elementsCoordinats);
 
         listeners = new ArrayList<>();
     }
 
-    private void sendStartMessage() {
-        Byte[] bytes = new Byte[60];
-        int count = 0;
-        for (byte y = 0; y < 15; y++) {
-            for (byte x = 0; x < 15; x++) {
-                if(board[y][x] != null){
-                    bytes[count] = y;
-                    count++;
-                    bytes[count] = x;
-                    count++;
-                    bytes[count] = (byte)((AbstractElement) board[y][x]).getIndex();
-                    count++;
-                }
-            }
-        }
-        ByteBuffer buffer = ByteBuffer.allocate(count - 1);
-        for(int i = 0; i < count; i++){
+    private void sendStartMessage(Byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+        for(int i = 0; i < bytes.length; i++){
             buffer.put(bytes[i]);
         }
         try {

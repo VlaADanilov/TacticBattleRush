@@ -50,7 +50,7 @@ public class RoomController {
             try {
                 service.cancelWaiting();
                 service.cancel();
-                HelloApplication.changeScene("setShips.fxml");
+                HelloApplication.changeScene("setUnits.fxml");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

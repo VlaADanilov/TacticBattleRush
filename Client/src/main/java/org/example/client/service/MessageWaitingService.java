@@ -14,7 +14,7 @@ public class MessageWaitingService extends Service<Boolean> {
             @Override
             protected Boolean call() throws Exception {
                 Message message = ClientImpl.getInstance().getMessage();
-                if(message.getType() == 1 && new String(message.getData()).equals("начать")){
+                if(message.getType() == 2){
                     updateValue(true);
                     return true;
                 }

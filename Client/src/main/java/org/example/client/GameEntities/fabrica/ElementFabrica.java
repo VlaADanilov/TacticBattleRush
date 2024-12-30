@@ -1,9 +1,9 @@
-package org.example.GameEntities.fabrica;
+package org.example.client.GameEntities.fabrica;
 
-import org.example.GameEntities.AbstractEntity;
-import org.example.GameEntities.elements.AbstractElement;
-import org.example.GameEntities.elements.Stone;
-import org.example.GameEntities.elements.Tree;
+
+import org.example.client.GameEntities.elements.AbstractElement;
+import org.example.client.GameEntities.elements.Stone;
+import org.example.client.GameEntities.elements.Tree;
 
 import java.util.Random;
 

@@ -6,16 +6,23 @@ import org.example.GameEntities.fabrica.ElementFabrica;
 import java.util.Random;
 
 public abstract class AbstractGameHandler implements GameHandlerInterface{
-    protected AbstractEntity[][] board;
 
-    protected void initBoard(){
-        board = new AbstractEntity[15][15];
+    protected Byte[] initBoard(){
 
         Random rand = new Random();
-        for(int i = 0; i< rand.nextInt(13); i++){
+        int size = rand.nextInt(14);
+        Byte[] bytes = new Byte[size*3];
+        int index = 0;
+        for(int i = 0; i< size; i++){
             int x = rand.nextInt(15);
             int y = rand.nextInt(15);
-            board[y][x] = ElementFabrica.getElement();
+            bytes[index] = (byte)y;
+            index++;
+            bytes[index] = (byte)x;
+            index++;
+            bytes[index] = (byte) ElementFabrica.getElement().getIndex();
+            index++;
         }
+        return bytes;
     }
 }
