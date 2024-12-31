@@ -14,6 +14,9 @@ import org.example.client.GameEntities.fabrica.ElementFabrica;
 import org.example.client.GameEntities.fabrica.SoldierFabrica;
 import org.example.client.board.BoardSingleton;
 import org.example.client.connectors.ClientImpl;
+import org.example.client.protocol.Message;
+import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
+import org.example.client.protocol.exception.WrongMessageTypeException;
 
 public class SetUnitController {
     @FXML
@@ -124,9 +127,13 @@ public class SetUnitController {
         horseKnightImage.setOpacity(1);
     }
 
-    public void next(ActionEvent actionEvent) {
+    public void next(ActionEvent actionEvent) throws ExceedingTheMaximumLengthException, WrongMessageTypeException {
+        ClientImpl.getInstance().sendMessage(
+                Message.createMessage(3, BoardSingleton.getInstance().getMySoldiersMessage())
+        );
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
         int i = 0;
+        //TODO переход на другую страницу
     }
 
     private Image getImageSoldier(int i){

@@ -1,15 +1,25 @@
 package org.example.client.board;
 
+import org.example.client.GameEntities.fabrica.SoldierFabrica;
 import org.example.client.GameEntities.soldiers.AbstractSoldier;
 import org.example.client.GameEntities.AbstractEntity;
 import org.example.client.GameEntities.elements.AbstractElement;
+import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BoardSingleton {
     private AbstractEntity[][] board;
+    private List<SoldierWithIndexAndCoordinats> mySoldiers;
+    private List<SoldierWithIndexAndCoordinats> opponentSoldiers;
 
     private static BoardSingleton instance;
     private BoardSingleton() {
         board = new AbstractEntity[15][15];
+        mySoldiers = new ArrayList<>();
+        opponentSoldiers = new ArrayList<>();
     }
     public synchronized static BoardSingleton getInstance() {
         if (instance == null) {
@@ -24,10 +34,13 @@ public class BoardSingleton {
 
     public void addMySoldier(AbstractSoldier soldier, int y, int x) {
         board[x][y] = soldier;
+        mySoldiers.add(new SoldierWithIndexAndCoordinats(soldier, x, y));
     }
 
     public void removeMySoldier(int y, int x){
         board[x][y] = null;
+        mySoldiers = mySoldiers.stream().filter((s)->
+                s.getCol() != y || s.getRow() != x).collect(Collectors.toList());
     }
 
     public boolean checkForNull(int y, int x){
@@ -36,5 +49,36 @@ public class BoardSingleton {
 
     public AbstractEntity[][] getBoard() {
         return board;
+    }
+
+    public byte[] getMySoldiersMessage(){
+        byte[] arr = new byte[mySoldiers.size()*3];
+        for(int i = 0; i < mySoldiers.size(); i++){
+            SoldierWithIndexAndCoordinats soldier = mySoldiers.get(i);
+            arr[i*3] = (byte) soldier.getSoldier().getINDEX();
+            arr[i*3+1] = (byte) soldier.getCol();
+            arr[i*3+2] = (byte) soldier.getRow();
+        }
+        return arr;
+    }
+
+    public int readCoordinateMessage(byte[] arr){
+        int ret = arr[0];
+
+        for(int i = 1; i < 4; i++){
+            mySoldiers.get(i - 1).setIndex(arr[i]);
+        }
+        for(int i = 4; i < arr.length; i+=4){
+            AbstractSoldier abstractSoldier = SoldierFabrica.getSoldier(arr[i+1]);
+            SoldierWithIndexAndCoordinats soldier = new SoldierWithIndexAndCoordinats(
+                    abstractSoldier,
+                    arr[i+3],
+                    arr[i+2]
+            );
+            soldier.setIndex(arr[i]);
+            opponentSoldiers.add(soldier);
+            board[arr[i+3]][arr[i+2]] = abstractSoldier;
+        }
+        return ret;
     }
 }

@@ -6,7 +6,6 @@ import org.example.GameEntities.fabrica.ElementFabrica;
 import java.util.Random;
 
 public abstract class AbstractGameHandler implements GameHandlerInterface{
-
     protected Byte[] initBoard(){
 
         Random rand = new Random();
