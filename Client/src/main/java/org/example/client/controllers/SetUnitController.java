@@ -12,11 +12,15 @@ import org.example.client.GameEntities.AbstractEntity;
 import org.example.client.GameEntities.elements.AbstractElement;
 import org.example.client.GameEntities.fabrica.ElementFabrica;
 import org.example.client.GameEntities.fabrica.SoldierFabrica;
+import org.example.client.HelloApplication;
 import org.example.client.board.BoardSingleton;
 import org.example.client.connectors.ClientImpl;
 import org.example.client.protocol.Message;
 import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
 import org.example.client.protocol.exception.WrongMessageTypeException;
+import org.example.client.util.Images;
+
+import java.io.IOException;
 
 public class SetUnitController {
     @FXML
@@ -37,10 +41,10 @@ public class SetUnitController {
     private int choice;
 
     public void initialize() {
-        heavyKnightImage.setImage(new Image(this.getClass().getResourceAsStream("/image/меч.jpg")));
-        archerImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лук.png")));
-        hillerImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лечение.png")));
-        horseKnightImage.setImage(new Image(this.getClass().getResourceAsStream("/image/лошадь.png")));
+        heavyKnightImage.setImage(Images.getSoldierImage(1));
+        archerImage.setImage(Images.getSoldierImage(2));
+        hillerImage.setImage(Images.getSoldierImage(3));
+        horseKnightImage.setImage(Images.getSoldierImage(4));
 
         submitButton.setDisable(true);
         for(int i = 0; i < gridPane.getRowCount(); i++){
@@ -60,7 +64,7 @@ public class SetUnitController {
                     else {
                         if (choice != 0 && cnt < 3 && BoardSingleton.getInstance().checkForNull(finalJ, finalI)) {
                             BoardSingleton.getInstance().addMySoldier(SoldierFabrica.getSoldier(choice), finalJ, finalI);
-                            ImageView imageView = new ImageView(getImageSoldier(choice));
+                            ImageView imageView = new ImageView(Images.getSoldierImage(choice));
                             imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
                             imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
                             pane.getChildren().add(imageView);
@@ -80,12 +84,8 @@ public class SetUnitController {
             AbstractElement element = ElementFabrica.getElement(arr[i+2]);
             BoardSingleton.getInstance().addElement(element, arr[i], arr[i+1]);
             Pane pane = new Pane();
-            ImageView imageView;
-            if(element.getIndex() == 1){
-                imageView = new ImageView(new Image(this.getClass().getResourceAsStream("/image/камень.jpg")));
-            }else{
-                imageView = new ImageView(new Image(this.getClass().getResourceAsStream("/image/дерево.png")));
-            }
+            ImageView imageView = new ImageView();
+            imageView.setImage(Images.getElementImage(element.getIndex()));
             gridPane.add(pane, arr[i],arr[i+1]);
 
             imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
@@ -127,23 +127,10 @@ public class SetUnitController {
         horseKnightImage.setOpacity(1);
     }
 
-    public void next(ActionEvent actionEvent) throws ExceedingTheMaximumLengthException, WrongMessageTypeException {
+    public void next(ActionEvent actionEvent) throws ExceedingTheMaximumLengthException, WrongMessageTypeException, IOException {
         ClientImpl.getInstance().sendMessage(
                 Message.createMessage(3, BoardSingleton.getInstance().getMySoldiersMessage())
         );
-        BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getMessage().getData());
-        AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
-        int i = 0;
-        //TODO переход на другую страницу
-    }
-
-    private Image getImageSoldier(int i){
-        return switch(i){
-            case 1 -> heavyKnightImage.getImage();
-            case 2 -> archerImage.getImage();
-            case 3 -> hillerImage.getImage();
-            case 4 -> horseKnightImage.getImage();
-            default -> throw new IllegalStateException("Unexpected value: " + i);
-        };
+        HelloApplication.changeScene("battle.fxml");
     }
 }
