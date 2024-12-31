@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     private Socket opponentTwo;
     private List<AbstractGameListener> listeners;
     private int hod;
-    private Map<Integer, AbstractSoldier> soldierMap;
+    private Map<Integer, AbstractSoldier> soldierMap = new HashMap<>();
 
 
     public GameHandlerImpl(Socket opponentOne, Socket opponentTwo, ServerExample serverExample) {

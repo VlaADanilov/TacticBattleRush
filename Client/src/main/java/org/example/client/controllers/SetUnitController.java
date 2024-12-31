@@ -131,6 +131,7 @@ public class SetUnitController {
         ClientImpl.getInstance().sendMessage(
                 Message.createMessage(3, BoardSingleton.getInstance().getMySoldiersMessage())
         );
+        BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getMessage().getData());
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
         int i = 0;
         //TODO переход на другую страницу
