@@ -119,6 +119,10 @@ public class BoardSingleton {
         throw new RuntimeException();
     }
 
+    public SoldierWithIndexAndCoordinats getMySoldierByIndex(int index){
+        return mySoldiers.stream().filter((s) -> s.getIndex() == index).findFirst().orElseThrow();
+    }
+
     public List<SoldierWithIndexAndCoordinats> getMySoldiers() {
         return mySoldiers;
     }

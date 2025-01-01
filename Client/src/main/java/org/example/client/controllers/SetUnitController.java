@@ -47,40 +47,10 @@ public class SetUnitController {
         horseKnightImage.setImage(Images.getSoldierImage(4));
 
         submitButton.setDisable(true);
-        for(int i = 0; i < gridPane.getRowCount(); i++){
-            for(int j = 0; j < gridPane.getColumnCount(); j++){
-                Pane pane = new Pane();
-                pane.setStyle("-fx-border-color: black; -fx-border-width: 2;");
-                int finalJ = j;
-                int finalI = i;
-                pane.setOnMouseClicked((event -> {
-                    BoardSingleton instance = BoardSingleton.getInstance();
-                    if(choice != 0 && cnt <= 3 && !BoardSingleton.getInstance().checkForNull(finalJ,finalI)){
-                        BoardSingleton.getInstance().removeMySoldier(finalJ, finalI);
-                        cnt--;
-                        pane.getChildren().clear();
-                        submitButton.setDisable(true);
-                    }
-                    else {
-                        if (choice != 0 && cnt < 3 && BoardSingleton.getInstance().checkForNull(finalJ, finalI)) {
-                            BoardSingleton.getInstance().addMySoldier(SoldierFabrica.getSoldier(choice), finalJ, finalI);
-                            ImageView imageView = new ImageView(Images.getSoldierImage(choice));
-                            imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
-                            imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
-                            pane.getChildren().add(imageView);
-                            cnt++;
-                            if (cnt == 3) {
-                                submitButton.setDisable(false);
-                            }
-                        }
-                    }
-                }));
-                gridPane.add(pane, j, i);
-            }
-        }
 
         byte[] arr = ClientImpl.getInstance().getLastMessage().getData();
-        for(int i = 0; i < arr.length; i += 3){
+        boolean hod = arr[0] == 1;
+        for(int i = 1; i < arr.length; i += 3){
             AbstractElement element = ElementFabrica.getElement(arr[i+2]);
             BoardSingleton.getInstance().addElement(element, arr[i], arr[i+1]);
             Pane pane = new Pane();
@@ -91,7 +61,42 @@ public class SetUnitController {
             imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
             imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
             pane.getChildren().add(imageView);
+        }
 
+        for(int i = 0; i < gridPane.getRowCount(); i++){
+            for(int j = 0; j < gridPane.getColumnCount(); j++){
+                Pane pane = new Pane();
+                if((j > 2 && hod) || (j < 12 && !hod)){
+                    pane.setStyle("-fx-background-color: grey; -fx-border-color: black");
+                }else{
+                    pane.setStyle("-fx-border-color: black; -fx-border-width: 2;");
+                    int finalJ = j;
+                    int finalI = i;
+                    pane.setOnMouseClicked((event -> {
+                        BoardSingleton instance = BoardSingleton.getInstance();
+                        if(choice != 0 && cnt <= 3 && !BoardSingleton.getInstance().checkForNull(finalJ,finalI)){
+                            BoardSingleton.getInstance().removeMySoldier(finalJ, finalI);
+                            cnt--;
+                            pane.getChildren().clear();
+                            submitButton.setDisable(true);
+                        }
+                        else {
+                            if (choice != 0 && cnt < 3 && BoardSingleton.getInstance().checkForNull(finalJ, finalI)) {
+                                BoardSingleton.getInstance().addMySoldier(SoldierFabrica.getSoldier(choice), finalJ, finalI);
+                                ImageView imageView = new ImageView(Images.getSoldierImage(choice));
+                                imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
+                                imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
+                                pane.getChildren().add(imageView);
+                                cnt++;
+                                if (cnt == 3) {
+                                    submitButton.setDisable(false);
+                                }
+                            }
+                        }
+                    }));
+                }
+                gridPane.add(pane, j, i);
+            }
         }
     }
 

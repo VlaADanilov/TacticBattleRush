@@ -89,7 +89,6 @@ public class BattleController {
     private void addHealthBars(List<SoldierWithIndexAndCoordinats> soldiers) {
         for (SoldierWithIndexAndCoordinats soldier : soldiers){
             ProgressBar progressBar = new ProgressBar(1);
-            // Применение стилей через CSS
             progressBar.setStyle(
                     "-fx-accent: red; " +  // Зеленый цвет прогресса
                             "-fx-background-color: grey; " + // Светло-серый фон
@@ -101,6 +100,26 @@ public class BattleController {
             progressBar.setPrefWidth(200);
             map.put(soldier.getIndex(), progressBar);
             Label label = new Label(soldier.getIndex() + " " + nameSoldier(soldier.getSoldier()));
+            label.setOnMouseClicked((event -> {
+                if(BoardSingleton.getInstance().isMySoldier(soldier.getIndex())){
+                    if(choice == 0){
+                        choice = soldier.getIndex();
+                        editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
+                    }
+                    else{
+                        if(choice != soldier.getIndex()){
+                            SoldierWithIndexAndCoordinats tempSold = BoardSingleton.getInstance().getMySoldierByIndex(choice);
+                            editBoardByDoingMovementSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getMovementradius(), "white");
+
+                            choice = soldier.getIndex();
+                            editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
+                            return;
+                        }
+                        choice = 0;
+                        editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "white");
+                    }
+                }
+            }));
             healthBox.getChildren().add(label);
             healthBox.getChildren().add(progressBar);
         }

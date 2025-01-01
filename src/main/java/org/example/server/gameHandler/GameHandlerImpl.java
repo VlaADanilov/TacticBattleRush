@@ -47,13 +47,17 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     }
 
     private void sendStartMessage(Byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+        ByteBuffer buffer1 = ByteBuffer.allocate(bytes.length + 1);
+        ByteBuffer buffer2 = ByteBuffer.allocate(bytes.length + 1);
+        buffer1.put(Byte.parseByte("1"));
+        buffer2.put(Byte.parseByte("2"));
         for(int i = 0; i < bytes.length; i++){
-            buffer.put(bytes[i]);
+            buffer1.put(bytes[i]);
+            buffer2.put(bytes[i]);
         }
         try {
-            server.sendMessage(opponentOne, Message.createMessage(2, buffer.array()));
-            server.sendMessage(opponentTwo, Message.createMessage(2, buffer.array()));
+            server.sendMessage(opponentOne, Message.createMessage(2, buffer1.array()));
+            server.sendMessage(opponentTwo, Message.createMessage(2, buffer2.array()));
         }catch (Exception e){
             throw new RuntimeException(e);
         }
