@@ -6,12 +6,10 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.client.controllers.BattleController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.BattleController">
    <top>
       <Label text="Tactic Battle Rush" BorderPane.alignment="CENTER">
          <font>
@@ -36,7 +34,7 @@
       </Label>
    </bottom>
    <center>
-      <GridPane fx:id="gridPane" gridLinesVisible="true" maxHeight="300.0" maxWidth="300.0" prefHeight="300.0" prefWidth="300.0" BorderPane.alignment="CENTER">
+       <GridPane fx:id="gridPane" gridLinesVisible="true" maxHeight="600.0" maxWidth="600.0" prefHeight="600.0" prefWidth="600.0" BorderPane.alignment="CENTER">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -73,4 +71,14 @@
         </rowConstraints>
       </GridPane>
    </center>
+   <left>
+      <VBox prefHeight="542.0" prefWidth="216.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets left="20.0" />
+         </BorderPane.margin>
+         <children>
+            <VBox fx:id="healthBox" prefHeight="200.0" prefWidth="100.0" />
+         </children>
+      </VBox>
+   </left>
 </BorderPane>

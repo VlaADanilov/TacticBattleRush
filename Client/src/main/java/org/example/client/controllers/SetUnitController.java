@@ -131,6 +131,7 @@ public class SetUnitController {
         ClientImpl.getInstance().sendMessage(
                 Message.createMessage(3, BoardSingleton.getInstance().getMySoldiersMessage())
         );
+        ClientImpl.getInstance().getMessage();
         HelloApplication.changeScene("battle.fxml");
     }
 }

@@ -6,9 +6,13 @@ import org.example.client.GameEntities.AbstractEntity;
 import org.example.client.GameEntities.elements.AbstractElement;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+
 
 public class BoardSingleton {
     private AbstractEntity[][] board;
@@ -76,9 +80,50 @@ public class BoardSingleton {
                     arr[i+2]
             );
             soldier.setIndex(arr[i]);
+            List<SoldierWithIndexAndCoordinats> opponentSoldiers1 = opponentSoldiers;
             opponentSoldiers.add(soldier);
             board[arr[i+3]][arr[i+2]] = abstractSoldier;
         }
         return ret;
+    }
+
+    public boolean isMySoldier(AbstractSoldier soldier){
+        for(SoldierWithIndexAndCoordinats s : mySoldiers){
+            if(s.getSoldier() == soldier) return true;
+        }
+        return false;
+    }
+
+    public boolean isMySoldier(int index){
+        for(SoldierWithIndexAndCoordinats s : mySoldiers){
+            if(s.getIndex() == index) return true;
+        }
+        return false;
+    }
+
+    public List<java.util.Map.Entry<Integer,Integer>> getMySoldiersCoordinates(){
+        List<java.util.Map.Entry<Integer,Integer>> list = new ArrayList<>();
+        for(int i = 0; i < mySoldiers.size(); i++){
+            SoldierWithIndexAndCoordinats soldier = mySoldiers.get(i);
+            list.add(new AbstractMap.SimpleEntry<>(soldier.getCol(),soldier.getRow()));
+        }
+        return list;
+    }
+
+    public SoldierWithIndexAndCoordinats getMySoldierByCoordinates(int column, int row){
+        for(SoldierWithIndexAndCoordinats s : mySoldiers){
+            if(s.getCol() == column && s.getRow() == row){
+                return s;
+            }
+        }
+        throw new RuntimeException();
+    }
+
+    public List<SoldierWithIndexAndCoordinats> getMySoldiers() {
+        return mySoldiers;
+    }
+
+    public List<SoldierWithIndexAndCoordinats> getOpponentSoldiers() {
+        return opponentSoldiers;
     }
 }
