@@ -9,7 +9,7 @@ public abstract class AbstractGameHandler implements GameHandlerInterface{
     protected Byte[] initBoard(){
 
         Random rand = new Random();
-        int size = rand.nextInt(14);
+        int size = rand.nextInt(25);
         Byte[] bytes = new Byte[size*3];
         int index = 0;
         for(int i = 0; i< size; i++){

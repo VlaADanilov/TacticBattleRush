@@ -1,6 +1,7 @@
 package org.example.client.controllers;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
@@ -120,8 +121,32 @@ public class BattleController {
                     }
                 }
             }));
+            label.setOnMouseEntered((event -> {
+                if(!BoardSingleton.getInstance().isMySoldier(soldier.getIndex())){
+                    editBoardByChoicingOpponent(soldier.getCol(),soldier.getRow(),true);
+                }
+            }));
+            label.setOnMouseExited((event -> {
+                if(!BoardSingleton.getInstance().isMySoldier(soldier.getIndex())){
+                    editBoardByChoicingOpponent(soldier.getCol(),soldier.getRow(),false);
+                }
+            }));
             healthBox.getChildren().add(label);
             healthBox.getChildren().add(progressBar);
+        }
+    }
+
+    private void editBoardByChoicingOpponent(int column, int row,boolean flag) {
+        for(Node node : gridPane.getChildren()){
+            if(Objects.equals(GridPane.getColumnIndex(node),column) && Objects.equals(GridPane.getRowIndex(node),row)){
+                Pane pane = (Pane) node;
+                if(flag) {
+                    pane.setStyle("-fx-background-color: #5E0505FF");
+                }else{
+                    pane.setStyle("-fx-background-color: red");
+                }
+                break;
+            }
         }
     }
 
