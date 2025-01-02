@@ -5,6 +5,7 @@ module ru.client {
     requires org.controlsfx.controls;
     requires com.almasb.fxgl.all;
     requires static lombok;
+    requires java.xml;
 
     opens org.example.client to javafx.fxml;
     exports org.example.client;

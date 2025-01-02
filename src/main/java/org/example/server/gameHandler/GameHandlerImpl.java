@@ -9,6 +9,7 @@ import org.example.protocol.Message;
 import org.example.server.ServerExample;
 import org.example.server.gameHandler.listeners.AbstractGameListener;
 import org.example.server.gameHandler.listeners.OpponentsCoordinatsListener;
+import org.example.server.gameHandler.listeners.UserActionListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +45,10 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         AbstractGameListener opponentsCoordinatsListener = new OpponentsCoordinatsListener();
         opponentsCoordinatsListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
         listeners.add(opponentsCoordinatsListener);
+
+        AbstractGameListener userActionListener = new UserActionListener();
+        userActionListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
+        listeners.add(userActionListener);
     }
 
     private void sendStartMessage(Byte[] bytes) {
@@ -67,6 +72,26 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     @Override
     public void run() {
         readAndSendCoordinatesMessages();
+        //TODO проверка, что жив хотя бы один персонаж
+        while(true){
+            try {
+                Message message;
+                if(hod == 1){
+                    message = Message.readMessage(opponentOne.getInputStream());
+                }else{
+                    message = Message.readMessage(opponentTwo.getInputStream());
+                }
+                for(AbstractGameListener listener : listeners){
+                    if(listener.getType() == message.getType()){
+                        listener.handle(hod, message);
+                        break;
+                    }
+                }
+                hod = hod == 1? 2 : 1;
+            }catch (Exception e){
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void readAndSendCoordinatesMessages(){
@@ -79,6 +104,7 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
                     listener.handle(2, messageTwo);
                     listener.handle(1, messageOne);
                     listener.handle(2, messageTwo);
+                    break;
                 }
             }
 

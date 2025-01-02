@@ -68,6 +68,6 @@ public class OpponentsCoordinatsListener extends AbstractGameListener{
 
     @Override
     public int getType() {
-        return 3;
+        return Message.TYPE3;
     }
 }

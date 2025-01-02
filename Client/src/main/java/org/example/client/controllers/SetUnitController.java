@@ -73,7 +73,6 @@ public class SetUnitController {
                     int finalJ = j;
                     int finalI = i;
                     pane.setOnMouseClicked((event -> {
-                        BoardSingleton instance = BoardSingleton.getInstance();
                         if(choice != 0 && cnt <= 3 && !BoardSingleton.getInstance().checkForNull(finalJ,finalI)){
                             BoardSingleton.getInstance().removeMySoldier(finalJ, finalI);
                             cnt--;

@@ -1,5 +1,6 @@
 package org.example.client.board;
 
+import lombok.val;
 import org.example.client.GameEntities.fabrica.SoldierFabrica;
 import org.example.client.GameEntities.soldiers.AbstractSoldier;
 import org.example.client.GameEntities.AbstractEntity;
@@ -111,6 +112,7 @@ public class BoardSingleton {
     }
 
     public SoldierWithIndexAndCoordinats getMySoldierByCoordinates(int column, int row){
+        List<SoldierWithIndexAndCoordinats> mySoldiers1 = mySoldiers;
         for(SoldierWithIndexAndCoordinats s : mySoldiers){
             if(s.getCol() == column && s.getRow() == row){
                 return s;
@@ -119,8 +121,35 @@ public class BoardSingleton {
         throw new RuntimeException();
     }
 
+    public SoldierWithIndexAndCoordinats getSoldierByIndex(int index){
+        SoldierWithIndexAndCoordinats soldier = null;
+        for(SoldierWithIndexAndCoordinats s : mySoldiers){
+            if(s.getIndex() == index){
+                soldier = s;
+                break;
+            }
+        }
+        if(soldier == null){
+            for(SoldierWithIndexAndCoordinats s : opponentSoldiers){
+                if(s.getIndex() == index){
+                    soldier = s;
+                    break;
+                }
+            }
+        }
+        return soldier;
+    }
+
     public SoldierWithIndexAndCoordinats getMySoldierByIndex(int index){
         return mySoldiers.stream().filter((s) -> s.getIndex() == index).findFirst().orElseThrow();
+    }
+
+    public void move(int soldierIndex, int column, int row){
+        SoldierWithIndexAndCoordinats soldier = getSoldierByIndex(soldierIndex);
+        board[soldier.getRow()][soldier.getCol()] = null;
+        board[row][column] = soldier.getSoldier();
+        soldier.setCol(column);
+        soldier.setRow(row);
     }
 
     public List<SoldierWithIndexAndCoordinats> getMySoldiers() {
