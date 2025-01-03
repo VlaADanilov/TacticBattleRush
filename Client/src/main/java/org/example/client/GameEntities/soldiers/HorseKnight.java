@@ -2,7 +2,7 @@ package org.example.client.GameEntities.soldiers;
 
 public class HorseKnight extends AbstractSoldier{
     public HorseKnight() {
-        super(4);
+        super(4,15);
         health=15;
         damage=5;
         movementradius=4;

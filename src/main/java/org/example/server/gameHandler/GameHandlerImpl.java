@@ -78,8 +78,10 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
                 Message message;
                 if(hod == 1){
                     message = Message.readMessage(opponentOne.getInputStream());
+                    Message.readMessage(opponentTwo.getInputStream());
                 }else{
                     message = Message.readMessage(opponentTwo.getInputStream());
+                    Message.readMessage(opponentOne.getInputStream());
                 }
                 for(AbstractGameListener listener : listeners){
                     if(listener.getType() == message.getType()){

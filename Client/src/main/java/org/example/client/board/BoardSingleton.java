@@ -5,6 +5,7 @@ import org.example.client.GameEntities.fabrica.SoldierFabrica;
 import org.example.client.GameEntities.soldiers.AbstractSoldier;
 import org.example.client.GameEntities.AbstractEntity;
 import org.example.client.GameEntities.elements.AbstractElement;
+import org.example.client.GameEntities.soldiers.Hiller;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 
 import java.util.AbstractMap;
@@ -140,6 +141,15 @@ public class BoardSingleton {
         return soldier;
     }
 
+    public boolean isOpponentSoldier(int index){
+        for(SoldierWithIndexAndCoordinats soldier : opponentSoldiers){
+            if(soldier.getIndex() == index){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public SoldierWithIndexAndCoordinats getMySoldierByIndex(int index){
         return mySoldiers.stream().filter((s) -> s.getIndex() == index).findFirst().orElseThrow();
     }
@@ -150,6 +160,34 @@ public class BoardSingleton {
         board[row][column] = soldier.getSoldier();
         soldier.setCol(column);
         soldier.setRow(row);
+    }
+
+    public SoldierWithIndexAndCoordinats action(int attacker, int defender){
+        AbstractSoldier attack = getSoldierByIndex(attacker).getSoldier();
+        AbstractSoldier def = getSoldierByIndex(defender).getSoldier();
+        attack.action(def);
+        SoldierWithIndexAndCoordinats sold = getSoldierByIndex(defender);
+        if(def.getHealth() <= 0){
+            def.setHealth(0);
+            mySoldiers.remove(sold);
+            opponentSoldiers.remove(sold);
+            board[sold.getRow()][sold.getCol()] = null;
+        }
+        return sold;
+    }
+
+    public SoldierWithIndexAndCoordinats getSoldier(int column, int row){
+        for(SoldierWithIndexAndCoordinats s : mySoldiers){
+            if(s.getCol() == column && s.getRow() == row){
+                return s;
+            }
+        }
+        for(SoldierWithIndexAndCoordinats s : opponentSoldiers){
+            if(s.getCol() == column && s.getRow() == row){
+                return s;
+            }
+        }
+        throw new RuntimeException();
     }
 
     public List<SoldierWithIndexAndCoordinats> getMySoldiers() {

@@ -13,9 +13,11 @@ public abstract class AbstractSoldier extends AbstractEntity {
     protected int damage;
     protected int movementradius;
     protected int damageRadius;
+    protected final int MAXHEALT;
 
-    protected AbstractSoldier(int index) {
+    protected AbstractSoldier(int index, int maxhealt) {
         INDEX = index;
+        MAXHEALT = maxhealt;
     }
 
     public abstract void action(AbstractSoldier soldier);
