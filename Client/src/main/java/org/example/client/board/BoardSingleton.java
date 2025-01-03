@@ -34,23 +34,23 @@ public class BoardSingleton {
         return instance;
     }
 
-    public void addElement(AbstractElement element, int y, int x) {
-        board[x][y] = element;
+    public void addElement(AbstractElement element, int column, int row) {
+        board[row][column] = element;
     }
 
-    public void addMySoldier(AbstractSoldier soldier, int y, int x) {
-        board[x][y] = soldier;
-        mySoldiers.add(new SoldierWithIndexAndCoordinats(soldier, x, y));
+    public void addMySoldier(AbstractSoldier soldier, int column, int row) {
+        board[row][column] = soldier;
+        mySoldiers.add(new SoldierWithIndexAndCoordinats(soldier, row, column));
     }
 
-    public void removeMySoldier(int y, int x){
-        board[x][y] = null;
+    public void removeMySoldier(int column, int row){
+        board[row][column] = null;
         mySoldiers = mySoldiers.stream().filter((s)->
-                s.getCol() != y || s.getRow() != x).collect(Collectors.toList());
+                s.getCol() != column || s.getRow() != row).collect(Collectors.toList());
     }
 
-    public boolean checkForNull(int y, int x){
-        return board[x][y] == null;
+    public boolean checkForNull(int column, int row){
+        return board[row][column] == null;
     }
 
     public AbstractEntity[][] getBoard() {

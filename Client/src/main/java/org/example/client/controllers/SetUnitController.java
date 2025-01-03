@@ -2,6 +2,7 @@ package org.example.client.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,7 +21,9 @@ import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
 import org.example.client.protocol.exception.WrongMessageTypeException;
 import org.example.client.util.Images;
 
+import java.awt.*;
 import java.io.IOException;
+import java.util.Objects;
 
 public class SetUnitController {
     @FXML
@@ -53,6 +56,12 @@ public class SetUnitController {
         for(int i = 1; i < arr.length; i += 3){
             AbstractElement element = ElementFabrica.getElement(arr[i+2]);
             BoardSingleton.getInstance().addElement(element, arr[i], arr[i+1]);
+            int finalI = i;
+            Node check = gridPane.getChildren().stream()
+                    .filter((entity) -> Objects.equals(GridPane.getRowIndex(entity), arr[finalI +1])
+                    && Objects.equals(GridPane.getColumnIndex(entity), arr[finalI]))
+                    .findAny().orElse(null);
+            if(check != null) gridPane.getChildren().remove(check);
             Pane pane = new Pane();
             ImageView imageView = new ImageView();
             imageView.setImage(Images.getElementImage(element.getIndex()));
