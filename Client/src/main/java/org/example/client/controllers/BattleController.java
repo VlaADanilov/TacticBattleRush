@@ -23,10 +23,7 @@ import org.example.client.util.Images;
 import org.example.client.util.MyStyle;
 import org.w3c.dom.ls.LSOutput;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BattleController {
@@ -114,7 +111,6 @@ public class BattleController {
                     action(attacker,defender);
                 }
 
-                myService.cancelWaiting();
                 hod = true;
                 hodLabel.setText("You are going");
                 editBoardByDoingMovement();
@@ -270,6 +266,7 @@ public class BattleController {
                                 choice = 0;
                                 hod = false;
                                 hodLabel.setText("Opponent is going");
+                                System.out.println("editBoardByDoingAttackSet");
                                 MyService myService = new MyService();
                                 myService.setOnSucceeded((event1 -> {
                                     Message message = ClientImpl.getInstance().getLastMessage();
@@ -277,6 +274,7 @@ public class BattleController {
                                         int index = message.getData()[0];
                                         int column1 = message.getData()[1];
                                         int row1 = message.getData()[2];
+                                        System.out.println(index + " " + column1 + " " + row1);
                                         move(index, column1, row1);
                                     }else{
                                         int attacker = message.getData()[0];
@@ -284,11 +282,11 @@ public class BattleController {
                                         action(attacker,defender);
                                     }
 
-                                    myService.cancelWaiting();
                                     hod = true;
                                     hodLabel.setText("You are going");
                                     editBoardByDoingMovement();
                                 }));
+                                myService.setOnFailed((event1)-> myService.getException().printStackTrace());
                                 myService.start();
                             }
                         });
@@ -359,13 +357,17 @@ public class BattleController {
                                 choice = 0;
                                 hod = false;
                                 hodLabel.setText("Opponent is going");
+                                System.out.println("editBoardByDoingMovementSet");
                                 MyService myService = new MyService();
                                 myService.setOnSucceeded((event1 -> {
+                                    System.out.println("А сервис вообще succeeded?!");
                                     Message message = ClientImpl.getInstance().getLastMessage();
+                                    System.out.println(message.getData().length);
                                     if(message.getData().length == 3){
                                         int index = message.getData()[0];
                                         int column1 = message.getData()[1];
                                         int row1 = message.getData()[2];
+                                        System.out.println(index + " " + column1 + " " + row1);
                                         move(index, column1, row1);
                                     }
                                     else{
@@ -374,11 +376,11 @@ public class BattleController {
                                         action(attacker,defender);
                                     }
 
-                                    myService.cancelWaiting();
                                     hod = true;
                                     hodLabel.setText("You are going");
                                     editBoardByDoingMovement();
                                 }));
+                                myService.setOnFailed((event2)-> myService.getException().printStackTrace());
                                 myService.start();
                             }
                         }));
@@ -428,33 +430,28 @@ public class BattleController {
         return "WTF";
     }
 
-    private class MyService extends Service<Boolean> {
+    private static class MyService extends Service<Boolean> {
 
         @Override
         protected Task<Boolean> createTask() {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            return new Task<Boolean>() {
+            return new Task<>() {
 
                 @Override
                 protected Boolean call() throws Exception {
+                    System.out.println("Сервис запущен");
                     ClientImpl.getInstance().sendMessage(
-                            Message.createMessage(4,new byte[0])
+                            Message.createMessage(4, new byte[0])
                     );
-                    Message message = ClientImpl.getInstance().getMessage();
-
-                    updateValue(true);
+                    System.out.println("Сервис отправил сообщение");
+                    ClientImpl.getInstance().getMessage();
+                    System.out.print("Сервис увидел сообщение: ");
+                    System.out.println(Arrays.toString(ClientImpl.getInstance().getLastMessage().getData()));
+                    System.out.println("\n--------------------------");
+                    System.out.println("Ну тут всё");
+                    this.done();
                     return true;
                 }
-
-
             };
-        }
-        public void cancelWaiting(){
-            this.cancel();
         }
     }
 }
