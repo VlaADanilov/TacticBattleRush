@@ -20,6 +20,7 @@ import org.example.client.protocol.Message;
 import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
 import org.example.client.protocol.exception.WrongMessageTypeException;
 import org.example.client.util.Images;
+import org.example.client.util.MyStyle;
 import org.w3c.dom.ls.LSOutput;
 
 import java.util.HashMap;
@@ -141,35 +142,39 @@ public class BattleController {
                     if(choice == 0){
                         choice = soldier.getIndex();
                         editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
+                        editBoardByDoingAttackSet(soldier.getCol(),soldier.getRow(),soldier.getSoldier().getDamageRadius(),true);
                     }
                     else{
                         if(choice != soldier.getIndex()){
                             SoldierWithIndexAndCoordinats tempSold = BoardSingleton.getInstance().getMySoldierByIndex(choice);
                             editBoardByDoingMovementSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getMovementradius(), "white");
-
+                            editBoardByDoingAttackSet(tempSold.getCol(),tempSold.getRow(),tempSold.getSoldier().getDamageRadius(),false);
                             choice = soldier.getIndex();
                             editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
+                            editBoardByDoingAttackSet(soldier.getCol(),soldier.getRow(),soldier.getSoldier().getDamageRadius(),true);
                             return;
                         }
                         choice = 0;
                         editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "white");
+                        editBoardByDoingAttackSet(soldier.getCol(),soldier.getRow(),soldier.getSoldier().getDamageRadius(),false);
                     }
                 }
             }));
+            MyStyle style = new MyStyle();
             label.setOnMouseEntered((event -> {
                 if(BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())){
-                    editBoardByChoicingOpponent(soldier.getCol(),soldier.getRow(),true);
+                    editBoardByChoicingOpponent(soldier.getCol(),soldier.getRow(),true, style);
                 }
                 if(BoardSingleton.getInstance().isMySoldier(soldier.getIndex())){
-                    editBoardByChoicingMy(soldier.getCol(),soldier.getRow(),true);
+                    editBoardByChoicingMy(soldier.getCol(),soldier.getRow(),true,style);
                 }
             }));
             label.setOnMouseExited((event -> {
                 if(BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())){
-                    editBoardByChoicingOpponent(soldier.getCol(),soldier.getRow(),false);
+                    editBoardByChoicingOpponent(soldier.getCol(),soldier.getRow(),false, style);
                 }
                 if(BoardSingleton.getInstance().isMySoldier(soldier.getIndex())){
-                    editBoardByChoicingMy(soldier.getCol(),soldier.getRow(),false);
+                    editBoardByChoicingMy(soldier.getCol(),soldier.getRow(),false,style);
                 }
             }));
             healthBox.getChildren().add(label);
@@ -177,28 +182,30 @@ public class BattleController {
         }
     }
 
-    private void editBoardByChoicingMy(int column, int row, boolean flag){
+    private void editBoardByChoicingMy(int column, int row, boolean flag, MyStyle style){
         for(Node node : gridPane.getChildren()){
             if(Objects.equals(GridPane.getColumnIndex(node),column) && Objects.equals(GridPane.getRowIndex(node),row)){
                 Pane pane = (Pane) node;
                 if(flag) {
+                    style.setStyle(pane.getStyle());
                     pane.setStyle("-fx-background-color: #081A8EFF");
                 }else{
-                    pane.setStyle("-fx-background-color: blue");
+                    pane.setStyle(style.getStyle());
                 }
                 break;
             }
         }
     }
 
-    private void editBoardByChoicingOpponent(int column, int row,boolean flag) {
+    private void editBoardByChoicingOpponent(int column, int row,boolean flag, MyStyle style) {
         for(Node node : gridPane.getChildren()){
             if(Objects.equals(GridPane.getColumnIndex(node),column) && Objects.equals(GridPane.getRowIndex(node),row)){
                 Pane pane = (Pane) node;
                 if(flag) {
+                    style.setStyle(pane.getStyle());
                     pane.setStyle("-fx-background-color: #5E0505FF");
                 }else{
-                    pane.setStyle("-fx-background-color: red");
+                    pane.setStyle(style.getStyle());
                 }
                 break;
             }
