@@ -21,7 +21,7 @@ import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
 import org.example.client.protocol.exception.WrongMessageTypeException;
 import org.example.client.util.Images;
 
-import java.awt.*;
+
 import java.io.IOException;
 import java.util.Objects;
 
