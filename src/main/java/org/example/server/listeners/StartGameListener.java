@@ -35,6 +35,7 @@ public class StartGameListener extends AbstractServerListener {
                                 t1.start();
                                 server.getSockets().remove(entry.getKey());
                             }
+                            break;
                         }
                     }else{
                         List<Map.Entry<Socket, Boolean>> entries = server.getSockets().get(entry.getKey());

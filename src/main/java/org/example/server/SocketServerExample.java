@@ -96,8 +96,17 @@ public class SocketServerExample implements ServerExample{
                        listener.handle(socket, message);
                    }
                }
-           }catch(IOException e){
-               throw new RuntimeException("Cannot read message", e);
+           }catch(Exception e){
+               for(Map.Entry<String, List<Map. Entry<Socket, Boolean>>> entry : sockets.entrySet()){
+                   for(Map.Entry<Socket, Boolean> socketEntry : entry.getValue()){
+                       if(socketEntry.getKey() == socket){
+                           sockets.get(entry.getKey()).remove(socketEntry);
+                           if(sockets.get(entry.getKey()).isEmpty()){
+                               sockets.remove(entry.getKey());
+                           }
+                       }
+                   }
+               }
            }
         });
         thread.setDaemon(true);
