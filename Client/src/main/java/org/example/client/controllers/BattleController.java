@@ -470,43 +470,5 @@ public class BattleController {
                 }
             };
         }
-
-        @Override
-        protected void succeeded() {
-            super.succeeded();
-            System.out.println("Service succeded " + getValue());
-            System.out.println(Arrays.toString(ClientImpl.getInstance().getLastMessage().getData()));
-        }
-
-        @Override
-        protected void scheduled() {
-            super.scheduled();
-            System.out.println("Service scheduled " + getValue());
-        }
-
-        @Override
-        protected void cancelled() {
-            super.cancelled();
-            System.out.println("Service cancelled " + getValue());
-        }
-
-        @Override
-        protected void ready() {
-            super.ready();
-            System.out.println("Service ready " + getValue());
-        }
-
-        @Override
-        protected void running() {
-            super.running();
-            System.out.println("Service running " + getValue());
-        }
-
-        @Override
-        protected void failed() {
-            super.failed();
-            System.out.println("Service failed " + getValue());
-            System.out.println(this.getException().getMessage());
-        }
     }
 }

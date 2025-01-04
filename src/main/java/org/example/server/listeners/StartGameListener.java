@@ -17,23 +17,38 @@ public class StartGameListener extends AbstractServerListener {
         for (Map.Entry<String, List<Map.Entry<Socket, Boolean>>> entry : sockets.entrySet()) {
             for(Map.Entry<Socket, Boolean> socketEntry : entry.getValue()) {
                 if(socketEntry.getKey().isConnected() && socketEntry.getKey().equals(socket)) {
-                    socketEntry.setValue(true);
-                    if(entry.getValue().size() == 2) {
-                        List<Map.Entry<Socket, Boolean>> values = entry.getValue();
-                        boolean flag = true;
-                        for(Map.Entry<Socket, Boolean> value : values) {
-                            flag = flag && value.getValue();
+                    if (message.getData()[0] == 1) {
+                        socketEntry.setValue(true);
+                        if (entry.getValue().size() == 2) {
+                            List<Map.Entry<Socket, Boolean>> values = entry.getValue();
+                            boolean flag = true;
+                            for (Map.Entry<Socket, Boolean> value : values) {
+                                flag = flag && value.getValue();
+                            }
+                            if (flag) {
+                                Thread t1 = new Thread(new GameHandlerImpl(
+                                        values.get(0).getKey(),
+                                        values.get(1).getKey(),
+                                        server
+                                ));
+                                t1.setDaemon(true);
+                                t1.start();
+                                server.getSockets().remove(entry.getKey());
+                            }
                         }
-                        if(flag) {
-                            Thread t1 = new Thread(new GameHandlerImpl(
-                                    values.get(0).getKey(),
-                                    values.get(1).getKey(),
-                                    server
-                            ));
-                            t1.setDaemon(true);
-                            t1.start();
+                    }else{
+                        List<Map.Entry<Socket, Boolean>> entries = server.getSockets().get(entry.getKey());
+                        for(Map.Entry<Socket,Boolean> ent : entries){
+                            if(ent.getKey() == socket){
+                                entries.remove(ent);
+                                break;
+                            }
+                        }
+                        if (server.getSockets().get(entry.getKey()).isEmpty()) {
+                            server.getSockets().remove(entry.getKey());
                         }
                     }
+                    break;
                 }
             }
         }

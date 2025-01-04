@@ -79,11 +79,29 @@ public class SocketServerExample implements ServerExample{
             while(true){
                 Socket socket = serverSocket.accept();
                 handleConnection(socket);
-                handleConnection(socket);
+                //запустить Thread ожидания готовности
+                waitReady(socket);
             }
         }catch(IOException e){
             throw new RuntimeException("Cannot connect to server", e);
         }
+    }
+
+    private void waitReady(Socket socket) {
+        Thread thread = new Thread(() -> {
+           try{
+               Message message = Message.readMessage(socket.getInputStream());
+               for(ServerEventListener listener : listeners){
+                   if(listener.getType() == message.getType()){
+                       listener.handle(socket, message);
+                   }
+               }
+           }catch(IOException e){
+               throw new RuntimeException("Cannot read message", e);
+           }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void handleConnection(Socket socket) {
@@ -92,6 +110,7 @@ public class SocketServerExample implements ServerExample{
             for(ServerEventListener listener : listeners){
                 if(message.getType() == listener.getType()){
                     listener.handle(socket, message);
+                    break;
                 }
             }
         }
