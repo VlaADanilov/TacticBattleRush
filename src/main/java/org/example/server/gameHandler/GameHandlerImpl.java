@@ -72,8 +72,8 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     @Override
     public void run() {
         readAndSendCoordinatesMessages();
-        //TODO проверка, что жив хотя бы один персонаж
-        while(true){
+        int winner = 0;
+        while(winner == 0){
             try {
                 Message message;
                 if(hod == 1){
@@ -88,9 +88,21 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
                     }
                 }
                 hod = hod == 1? 2 : 1;
+                winner = whoWinner();
             }catch (Exception e){
                 throw new RuntimeException(e);
             }
+        }
+        try {
+            if (winner == 1) {
+                server.sendMessage(opponentOne, Message.createMessage(5, new byte[]{1}));
+                server.sendMessage(opponentTwo, Message.createMessage(5, new byte[]{2}));
+            } else {
+                server.sendMessage(opponentTwo, Message.createMessage(5, new byte[]{1}));
+                server.sendMessage(opponentOne, Message.createMessage(5, new byte[]{2}));
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
         }
     }
 
@@ -111,5 +123,19 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private int whoWinner(){
+        int summaHealth = 0;
+        for(int i = 1; i <= soldierMap.size() / 2; i++){
+            summaHealth += soldierMap.get(i).getHealth();
+        }
+        if(summaHealth == 0) return 2;
+        summaHealth = 0;
+        for(int i = soldierMap.size() / 2 + 1; i <= soldierMap.size(); i++){
+            summaHealth += soldierMap.get(i).getHealth();
+        }
+        if(summaHealth == 0) return 1;
+        return 0;
     }
 }

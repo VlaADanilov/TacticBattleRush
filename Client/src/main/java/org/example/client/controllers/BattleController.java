@@ -2,6 +2,7 @@ package org.example.client.controllers;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -13,6 +14,7 @@ import javafx.scene.layout.VBox;
 import org.example.client.GameEntities.AbstractEntity;
 import org.example.client.GameEntities.elements.AbstractElement;
 import org.example.client.GameEntities.soldiers.*;
+import org.example.client.HelloApplication;
 import org.example.client.board.BoardSingleton;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 import org.example.client.connectors.ClientImpl;
@@ -21,10 +23,9 @@ import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
 import org.example.client.protocol.exception.WrongMessageTypeException;
 import org.example.client.util.Images;
 import org.example.client.util.MyStyle;
-import org.w3c.dom.ls.LSOutput;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BattleController {
     @FXML
@@ -36,8 +37,14 @@ public class BattleController {
     boolean hod;
     private Map<Integer, ProgressBar> map;
     private int choice = 0;
+    private MyService myService;
 
     public void initialize(){
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            System.err.println("Uncaught exception in thread: " + thread.getName());
+            throwable.printStackTrace();
+        });
+        myService = getMyService();
         hod = BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getLastMessage().getData()) == 1;
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
         for(int y = 0; y < gridPane.getColumnCount(); y++){
@@ -97,25 +104,10 @@ public class BattleController {
         }
         else{
             hodLabel.setText("Opponent is going");
-            MyService myService = new MyService();
-            myService.setOnSucceeded((event1 -> {
-                Message message = ClientImpl.getInstance().getLastMessage();
-                if(message.getData().length == 3){
-                    int index = message.getData()[0];
-                    int column1 = message.getData()[1];
-                    int row1 = message.getData()[2];
-                    move(index, column1, row1);
-                }else{
-                    int attacker = message.getData()[0];
-                    int defender = message.getData()[1];
-                    action(attacker,defender);
-                }
-
-                hod = true;
-                hodLabel.setText("You are going");
-                editBoardByDoingMovement();
-            }));
-            myService.start();
+            if(myService.getState() == Worker.State.READY
+            || myService.getState() == Worker.State.SCHEDULED) {
+                myService.start();
+            }
         }
     }
 
@@ -266,28 +258,10 @@ public class BattleController {
                                 choice = 0;
                                 hod = false;
                                 hodLabel.setText("Opponent is going");
-                                System.out.println("editBoardByDoingAttackSet");
-                                MyService myService = new MyService();
-                                myService.setOnSucceeded((event1 -> {
-                                    Message message = ClientImpl.getInstance().getLastMessage();
-                                    if(message.getData().length == 3){
-                                        int index = message.getData()[0];
-                                        int column1 = message.getData()[1];
-                                        int row1 = message.getData()[2];
-                                        System.out.println(index + " " + column1 + " " + row1);
-                                        move(index, column1, row1);
-                                    }else{
-                                        int attacker = message.getData()[0];
-                                        int defender = message.getData()[1];
-                                        action(attacker,defender);
-                                    }
-
-                                    hod = true;
-                                    hodLabel.setText("You are going");
-                                    editBoardByDoingMovement();
-                                }));
-                                myService.setOnFailed((event1)-> myService.getException().printStackTrace());
-                                myService.start();
+                                if(myService.getState() == Worker.State.READY
+                                        || myService.getState() == Worker.State.SCHEDULED) {
+                                    myService.start();
+                                }
                             }
                         });
                     }else{
@@ -357,37 +331,77 @@ public class BattleController {
                                 choice = 0;
                                 hod = false;
                                 hodLabel.setText("Opponent is going");
-                                System.out.println("editBoardByDoingMovementSet");
-                                MyService myService = new MyService();
-                                myService.setOnSucceeded((event1 -> {
-                                    System.out.println("А сервис вообще succeeded?!");
-                                    Message message = ClientImpl.getInstance().getLastMessage();
-                                    System.out.println(message.getData().length);
-                                    if(message.getData().length == 3){
-                                        int index = message.getData()[0];
-                                        int column1 = message.getData()[1];
-                                        int row1 = message.getData()[2];
-                                        System.out.println(index + " " + column1 + " " + row1);
-                                        move(index, column1, row1);
-                                    }
-                                    else{
-                                        int attacker = message.getData()[0];
-                                        int defender = message.getData()[1];
-                                        action(attacker,defender);
-                                    }
-
-                                    hod = true;
-                                    hodLabel.setText("You are going");
-                                    editBoardByDoingMovement();
-                                }));
-                                myService.setOnFailed((event2)-> myService.getException().printStackTrace());
-                                myService.start();
+                                if(myService.getState() == Worker.State.READY
+                                        || myService.getState() == Worker.State.SCHEDULED) {
+                                    myService.start();
+                                }
                             }
                         }));
                     }
                 }
             }
         }
+    }
+
+    private MyService getMyService() {
+        MyService myService = new MyService();
+        myService.setOnSucceeded((event1 -> {
+            Message message = ClientImpl.getInstance().getLastMessage();
+            System.out.println(Message.toString(message));
+            if(message.getType() == 4) {
+                if (message.getData().length == 3) {
+                    int index = message.getData()[0];
+                    int column1 = message.getData()[1];
+                    int row1 = message.getData()[2];
+                    move(index, column1, row1);
+                } else {
+                    int attacker = message.getData()[0];
+                    int defender = message.getData()[1];
+                    action(attacker, defender);
+                }
+
+                boolean flag = false;
+                for(int i = 1; i <= map.size(); i++){
+                    if(BoardSingleton.getInstance().isMySoldier(i)){
+                        flag = flag || map.get(i).getProgress() != 0;
+                    }
+                }
+                if(!flag){
+                    System.out.println("Ты проиграл");
+                    BoardSingleton.getInstance().clear();
+                    ClientImpl.getInstance().disconnect();
+                    try {
+                        HelloApplication.changeScene("hello-view.fxml");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                hod = true;
+                hodLabel.setText("You are going");
+                editBoardByDoingMovement();
+                myService.reset();
+            }
+            else{
+                //TODO нужна нормальная логика
+                if(message.getType() == 5){
+                    if(message.getData()[0] == 1) {
+                        System.out.println("Ты выиграл");
+                    }
+                    else{
+                        System.out.println("Ты проиграл");
+                    }
+                    BoardSingleton.getInstance().clear();
+                    ClientImpl.getInstance().disconnect();
+                    try {
+                        HelloApplication.changeScene("hello-view.fxml");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }));
+        myService.setOnFailed((event2)-> myService.getException().printStackTrace());
+        return myService;
     }
 
 
@@ -437,21 +451,62 @@ public class BattleController {
             return new Task<>() {
 
                 @Override
-                protected Boolean call() throws Exception {
-                    System.out.println("Сервис запущен");
-                    ClientImpl.getInstance().sendMessage(
-                            Message.createMessage(4, new byte[0])
-                    );
-                    System.out.println("Сервис отправил сообщение");
-                    ClientImpl.getInstance().getMessage();
-                    System.out.print("Сервис увидел сообщение: ");
-                    System.out.println(Arrays.toString(ClientImpl.getInstance().getLastMessage().getData()));
-                    System.out.println("\n--------------------------");
-                    System.out.println("Ну тут всё");
-                    this.done();
-                    return true;
+                protected Boolean call(){
+
+                    try {
+                        System.out.println("----------------------");
+                        ClientImpl.getInstance().sendMessage(
+                                Message.createMessage(4, new byte[0])
+                        );
+                        ClientImpl.getInstance().getMessage();
+                        System.out.println(Arrays.toString(ClientImpl.getInstance().getLastMessage().getData()));
+                        updateValue(true);
+                        System.out.println("Код пошёл дальше, чем updateValue");
+                        return true;
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return false;
+                    }
                 }
             };
+        }
+
+        @Override
+        protected void succeeded() {
+            super.succeeded();
+            System.out.println("Service succeded " + getValue());
+            System.out.println(Arrays.toString(ClientImpl.getInstance().getLastMessage().getData()));
+        }
+
+        @Override
+        protected void scheduled() {
+            super.scheduled();
+            System.out.println("Service scheduled " + getValue());
+        }
+
+        @Override
+        protected void cancelled() {
+            super.cancelled();
+            System.out.println("Service cancelled " + getValue());
+        }
+
+        @Override
+        protected void ready() {
+            super.ready();
+            System.out.println("Service ready " + getValue());
+        }
+
+        @Override
+        protected void running() {
+            super.running();
+            System.out.println("Service running " + getValue());
+        }
+
+        @Override
+        protected void failed() {
+            super.failed();
+            System.out.println("Service failed " + getValue());
+            System.out.println(this.getException().getMessage());
         }
     }
 }

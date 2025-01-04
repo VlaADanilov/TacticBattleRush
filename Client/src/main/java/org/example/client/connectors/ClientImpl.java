@@ -63,7 +63,14 @@ public class ClientImpl implements ClientExample{
         }
     }
 
+    @Override
+    public void disconnect() {
+        instance = null;
+    }
+
     public Message getLastMessage() {
         return lastMessage;
     }
+
+
 }

@@ -7,4 +7,6 @@ public interface ClientExample {
     void connect();
     void sendMessage(Message message);
     Message getMessage();
+
+    void disconnect();
 }

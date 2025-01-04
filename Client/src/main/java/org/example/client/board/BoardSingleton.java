@@ -197,4 +197,8 @@ public class BoardSingleton {
     public List<SoldierWithIndexAndCoordinats> getOpponentSoldiers() {
         return opponentSoldiers;
     }
+
+    public void clear(){
+        instance = null;
+    }
 }
