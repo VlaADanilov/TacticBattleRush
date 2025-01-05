@@ -53,6 +53,10 @@ public class BoardSingleton {
         return board[row][column] == null;
     }
 
+    public boolean checkForSoldier(int column, int row){
+        return board[row][column] != null && board[row][column] instanceof AbstractSoldier;
+    }
+
     public AbstractEntity[][] getBoard() {
         return board;
     }

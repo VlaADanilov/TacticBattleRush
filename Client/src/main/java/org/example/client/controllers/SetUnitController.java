@@ -1,5 +1,7 @@
 package org.example.client.controllers;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class SetUnitController {
+    private MyService service;
     @FXML
     private GridPane gridPane;
     @FXML
@@ -82,7 +85,10 @@ public class SetUnitController {
                     int finalJ = j;
                     int finalI = i;
                     pane.setOnMouseClicked((event -> {
-                        if(choice != 0 && cnt <= 3 && !BoardSingleton.getInstance().checkForNull(finalJ,finalI)){
+                        if(choice == -1){
+                            return;
+                        }
+                        if(choice != 0 && cnt <= 3 && BoardSingleton.getInstance().checkForSoldier(finalJ,finalI)){
                             BoardSingleton.getInstance().removeMySoldier(finalJ, finalI);
                             cnt--;
                             pane.getChildren().clear();
@@ -144,7 +150,45 @@ public class SetUnitController {
         ClientImpl.getInstance().sendMessage(
                 Message.createMessage(3, BoardSingleton.getInstance().getMySoldiersMessage())
         );
-        ClientImpl.getInstance().getMessage();
-        HelloApplication.changeScene("battle.fxml");
+        choice = -1;
+        heavyKnightImage.setDisable(true);
+        heavyKnightImage.setOpacity(0);
+        archerImage.setDisable(true);
+        archerImage.setOpacity(0);
+        hillerImage.setDisable(true);
+        hillerImage.setOpacity(0);
+        horseKnightImage.setDisable(true);
+        horseKnightImage.setOpacity(0);
+
+        service = new MyService();
+
+        service.setOnSucceeded((event) -> {
+            try {
+                HelloApplication.changeScene("battle.fxml");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        service.start();
+    }
+
+    private static class MyService extends Service<Boolean> {
+
+        @Override
+        protected Task<Boolean> createTask() {
+            return new Task<Boolean>() {
+
+                @Override
+                protected Boolean call() throws Exception {
+                    Message message = ClientImpl.getInstance().getMessage();
+                    if(message.getType() == 3){
+                        return true;
+                    }else{
+                        throw new RuntimeException();
+                    }
+                }
+            };
+        }
     }
 }
