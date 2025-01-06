@@ -26,6 +26,7 @@ import org.example.client.protocol.exception.WrongMessageTypeException;
 import org.example.client.util.Images;
 import org.example.client.util.MyStyle;
 import org.example.client.util.Player;
+import org.example.client.util.SoldierSpeciality;
 
 import java.io.IOException;
 import java.util.*;
@@ -244,32 +245,38 @@ public class BattleController {
                     Pane pane = (Pane) gridPane.getChildren().stream()
                             .filter((ent)->Objects.equals(GridPane.getColumnIndex(ent),finalTempColumn) && Objects.equals(GridPane.getRowIndex(ent),finalTempRow)).findAny().orElseThrow();
                     if(flag){
-                        pane.setStyle("-fx-background-color: #CF4658FF");
-                        pane.setOnMouseClicked((event) -> {
-                            if(hod && choice != 0){
-                                SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
-                                editBoardByDoingMovementSet(column,row,mySoldierByCoordinates.getSoldier().getMovementradius(),"white");
-                                editBoardByDoingAttackSet(column,row,damageradius,false);
-                                SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(finalTempColumn, finalTempRow);
-                                action(Player.You,choice,soldier.getIndex());
-                                try {
-                                    ClientImpl.getInstance().sendMessage(
-                                            Message.createMessage(4, new byte[]{(byte) choice, (byte) soldier.getIndex()})
-                                    );
-                                } catch (ExceedingTheMaximumLengthException e) {
-                                    throw new RuntimeException(e);
-                                } catch (WrongMessageTypeException e) {
-                                    throw new RuntimeException(e);
+                        int soldierIndex = BoardSingleton.getInstance().getSoldier(finalTempColumn, finalTempRow).getIndex();
+                        if((SoldierSpeciality.isActionForOpponent(BoardSingleton.getInstance().getSoldier(column,row).getSoldier())
+                        && BoardSingleton.getInstance().isOpponentSoldier(soldierIndex))
+                        || (!SoldierSpeciality.isActionForOpponent(BoardSingleton.getInstance().getSoldier(column,row).getSoldier())
+                                && BoardSingleton.getInstance().isMySoldier(soldierIndex))){
+                            pane.setStyle("-fx-background-color: #CF4658FF");
+                            pane.setOnMouseClicked((event) -> {
+                                if(hod && choice != 0){
+                                    SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
+                                    editBoardByDoingMovementSet(column,row,mySoldierByCoordinates.getSoldier().getMovementradius(),"white");
+                                    editBoardByDoingAttackSet(column,row,damageradius,false);
+                                    SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(finalTempColumn, finalTempRow);
+                                    action(Player.You,choice,soldier.getIndex());
+                                    try {
+                                        ClientImpl.getInstance().sendMessage(
+                                                Message.createMessage(4, new byte[]{(byte) choice, (byte) soldier.getIndex()})
+                                        );
+                                    } catch (ExceedingTheMaximumLengthException e) {
+                                        throw new RuntimeException(e);
+                                    } catch (WrongMessageTypeException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    choice = 0;
+                                    hod = false;
+                                    hodLabel.setText("Opponent is going");
+                                    if(myService.getState() == Worker.State.READY
+                                            || myService.getState() == Worker.State.SCHEDULED) {
+                                        myService.start();
+                                    }
                                 }
-                                choice = 0;
-                                hod = false;
-                                hodLabel.setText("Opponent is going");
-                                if(myService.getState() == Worker.State.READY
-                                        || myService.getState() == Worker.State.SCHEDULED) {
-                                    myService.start();
-                                }
-                            }
-                        });
+                            });
+                        }
                     }else{
                         SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(finalTempColumn, finalTempRow);
                         if(BoardSingleton.getInstance().isMySoldier(soldier.getIndex())){
