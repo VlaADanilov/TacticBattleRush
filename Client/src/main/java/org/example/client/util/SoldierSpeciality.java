@@ -21,4 +21,8 @@ public class SoldierSpeciality {
     public static boolean isActionForOpponent(AbstractSoldier soldier){
         return damageOpponent.contains(soldier.getClass());
     }
+
+    public static boolean oneDoingByHod(AbstractSoldier soldier){
+        return soldier.getClass().equals(Archer.class);
+    }
 }

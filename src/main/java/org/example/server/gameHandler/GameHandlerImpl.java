@@ -126,6 +126,7 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     }
 
     private int whoWinner(){
+        Map<Integer, AbstractSoldier> soldierMap1 = soldierMap;
         int summaHealth = 0;
         for(int i = 1; i <= soldierMap.size() / 2; i++){
             summaHealth += soldierMap.get(i).getHealth();
@@ -136,6 +137,7 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
             summaHealth += soldierMap.get(i).getHealth();
         }
         if(summaHealth == 0) return 1;
+
         return 0;
     }
 }

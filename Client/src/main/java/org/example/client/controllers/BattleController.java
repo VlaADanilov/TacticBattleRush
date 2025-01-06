@@ -44,6 +44,7 @@ public class BattleController {
     private Map<Integer, ProgressBar> map;
     private int choice = 0;
     private MyService myService;
+    private byte[] array;
 
     public void initialize(){
         myService = getMyService();
@@ -212,7 +213,7 @@ public class BattleController {
             SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getMySoldierByCoordinates(entry.getKey(), entry.getValue());
             pane.setOnMouseClicked((event ->
             {
-                if(hod) {
+                if(hod && array == null) {
                     if (choice == 0) {
                         choice = soldier.getIndex();
 
@@ -232,7 +233,8 @@ public class BattleController {
         }
     }
 
-    private void editBoardByDoingAttackSet(Integer column, Integer row, int damageradius,boolean flag){
+    private int editBoardByDoingAttackSet(Integer column, Integer row, int damageradius,boolean flag){
+        int result = 0;
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
         for(int tempColumn = column - damageradius; tempColumn <= column + damageradius; tempColumn++){
             if(tempColumn < 0 || tempColumn > 14) continue;
@@ -250,6 +252,7 @@ public class BattleController {
                         && BoardSingleton.getInstance().isOpponentSoldier(soldierIndex))
                         || (!SoldierSpeciality.isActionForOpponent(BoardSingleton.getInstance().getSoldier(column,row).getSoldier())
                                 && BoardSingleton.getInstance().isMySoldier(soldierIndex))){
+                            result++;
                             pane.setStyle("-fx-background-color: #CF4658FF");
                             pane.setOnMouseClicked((event) -> {
                                 if(hod && choice != 0){
@@ -258,14 +261,28 @@ public class BattleController {
                                     editBoardByDoingAttackSet(column,row,damageradius,false);
                                     SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(finalTempColumn, finalTempRow);
                                     action(Player.You,choice,soldier.getIndex());
-                                    try {
-                                        ClientImpl.getInstance().sendMessage(
-                                                Message.createMessage(4, new byte[]{(byte) choice, (byte) soldier.getIndex()})
-                                        );
-                                    } catch (ExceedingTheMaximumLengthException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (WrongMessageTypeException e) {
-                                        throw new RuntimeException(e);
+                                    if(array == null) {
+                                        try {
+                                            ClientImpl.getInstance().sendMessage(
+                                                    Message.createMessage(4, new byte[]{(byte) choice, (byte) soldier.getIndex()})
+                                            );
+                                        } catch (ExceedingTheMaximumLengthException e) {
+                                            throw new RuntimeException(e);
+                                        } catch (WrongMessageTypeException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }else{
+                                        array[3] = (byte) choice;
+                                        array[4] = (byte) soldier.getIndex();
+                                        try {
+                                            ClientImpl.getInstance().sendMessage(
+                                                    Message.createMessage(4, array)
+                                            );
+                                        } catch (ExceedingTheMaximumLengthException e) {
+                                            throw new RuntimeException(e);
+                                        } catch (WrongMessageTypeException e) {
+                                            throw new RuntimeException(e);
+                                        }
                                     }
                                     choice = 0;
                                     hod = false;
@@ -290,6 +307,7 @@ public class BattleController {
                 }
             }
         }
+        return result;
     }
 
     private void action(Player player,int attacker, int defender) {
@@ -355,23 +373,32 @@ public class BattleController {
                             if(hod && choice != 0){
                                 SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
                                 editBoardByDoingMovementSet(column,row,movementradius,"white");
-                                editBoardByDoingAttackSet(column,row, mySoldierByCoordinates.getSoldier().getDamageRadius(),false);
-                                move(Player.You,choice,finalTempColumn,finalTempRow);
-                                try {
-                                    ClientImpl.getInstance().sendMessage(
-                                            Message.createMessage(4, new byte[]{(byte) choice, (byte) finalTempColumn, (byte) finalTempRow})
-                                    );
-                                } catch (ExceedingTheMaximumLengthException e) {
-                                    throw new RuntimeException(e);
-                                } catch (WrongMessageTypeException e) {
-                                    throw new RuntimeException(e);
+                                editBoardByDoingAttackSet(column, row, mySoldierByCoordinates.getSoldier().getDamageRadius(), false);
+                                move(Player.You, choice, finalTempColumn, finalTempRow);
+                                int result = 0;
+                                if(!SoldierSpeciality.oneDoingByHod(mySoldierByCoordinates.getSoldier())){
+                                    result = editBoardByDoingAttackSet(mySoldierByCoordinates.getCol(), mySoldierByCoordinates.getRow(), mySoldierByCoordinates.getSoldier().getDamageRadius(),true);
                                 }
-                                choice = 0;
-                                hod = false;
-                                hodLabel.setText("Opponent is going");
-                                if(myService.getState() == Worker.State.READY
-                                        || myService.getState() == Worker.State.SCHEDULED) {
-                                    myService.start();
+                                if(result == 0) {
+
+                                    try {
+                                        ClientImpl.getInstance().sendMessage(
+                                                Message.createMessage(4, new byte[]{(byte) choice, (byte) finalTempColumn, (byte) finalTempRow})
+                                        );
+                                    } catch (ExceedingTheMaximumLengthException e) {
+                                        throw new RuntimeException(e);
+                                    } catch (WrongMessageTypeException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    choice = 0;
+                                    hod = false;
+                                    hodLabel.setText("Opponent is going");
+                                    if(myService.getState() == Worker.State.READY
+                                            || myService.getState() == Worker.State.SCHEDULED) {
+                                        myService.start();
+                                    }
+                                }else{
+                                    array = new byte[]{(byte) choice, (byte) finalTempColumn, (byte) finalTempRow,0,0};
                                 }
                             }
                         }));
@@ -392,9 +419,19 @@ public class BattleController {
                     int row1 = message.getData()[2];
                     move(Player.Opponent,index, column1, row1);
                 } else {
-                    int attacker = message.getData()[0];
-                    int defender = message.getData()[1];
-                    action(Player.Opponent,attacker, defender);
+                    if(message.getData().length == 2) {
+                        int attacker = message.getData()[0];
+                        int defender = message.getData()[1];
+                        action(Player.Opponent, attacker, defender);
+                    }else{
+                        int index = message.getData()[0];
+                        int column1 = message.getData()[1];
+                        int row1 = message.getData()[2];
+                        move(Player.Opponent,index, column1, row1);
+                        int attacker = message.getData()[3];
+                        int defender = message.getData()[4];
+                        action(Player.Opponent, attacker, defender);
+                    }
                 }
 
                 boolean flag = false;
@@ -416,6 +453,7 @@ public class BattleController {
                 hod = true;
                 hodLabel.setText("You are going");
                 editBoardByDoingMovement();
+                array = null;
                 myService.reset();
             }
             else{

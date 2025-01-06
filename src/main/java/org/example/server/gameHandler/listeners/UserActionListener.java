@@ -8,12 +8,20 @@ import java.util.Arrays;
 public class UserActionListener extends AbstractGameListener{
     @Override
     public void handle(int i, Message message) {
-        if(message.getData().length == 2){
-            int index1 = message.getData()[0];
-            int index2 = message.getData()[1];
+        if(message.getData().length == 2 || message.getData().length == 5){
 
-            soldierMap.get(index1).action(soldierMap.get(index2));
-            if(soldierMap.get(index2).getHealth() < 0) soldierMap.get(index2).setHealth(0);
+            int index1;
+            int index2;
+
+            if(message.getData().length == 2){
+                index1 = message.getData()[0];
+                index2 = message.getData()[1];
+            }else{
+                index1 = message.getData()[3];
+                index2 = message.getData()[4];
+            }
+
+            action(index1, index2);
         }
 
         try{
@@ -28,6 +36,11 @@ public class UserActionListener extends AbstractGameListener{
             throw new RuntimeException(e);
         }
 
+    }
+
+    private void action(int index1, int index2){
+        soldierMap.get(index1).action(soldierMap.get(index2));
+        if(soldierMap.get(index2).getHealth() < 0) soldierMap.get(index2).setHealth(0);
     }
 
     @Override
