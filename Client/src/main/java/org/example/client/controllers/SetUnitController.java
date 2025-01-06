@@ -60,11 +60,10 @@ public class SetUnitController {
             AbstractElement element = ElementFabrica.getElement(arr[i+2]);
             BoardSingleton.getInstance().addElement(element, arr[i], arr[i+1]);
             int finalI = i;
-            Node check = gridPane.getChildren().stream()
-                    .filter((entity) -> Objects.equals(GridPane.getRowIndex(entity), arr[finalI +1])
-                    && Objects.equals(GridPane.getColumnIndex(entity), arr[finalI]))
-                    .findAny().orElse(null);
-            if(check != null) gridPane.getChildren().remove(check);
+            gridPane.getChildren().stream()
+                    .filter((entity) -> Objects.equals(GridPane.getRowIndex(entity), (int) arr[finalI + 1])
+                            && Objects.equals(GridPane.getColumnIndex(entity), (int) arr[finalI]))
+                    .findAny().ifPresent(check -> gridPane.getChildren().remove(check));
             Pane pane = new Pane();
             ImageView imageView = new ImageView();
             imageView.setImage(Images.getElementImage(element.getIndex()));

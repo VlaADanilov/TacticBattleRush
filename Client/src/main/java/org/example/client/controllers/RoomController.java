@@ -39,7 +39,6 @@ public class RoomController {
                 stat = strings[1];
             }
         }
-        System.out.println(stat);
         if(stat.equals("Занято")){
             readyButton.setDisable(true);
             messageNeeded = false;

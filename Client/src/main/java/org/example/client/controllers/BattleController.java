@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -23,11 +25,14 @@ import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
 import org.example.client.protocol.exception.WrongMessageTypeException;
 import org.example.client.util.Images;
 import org.example.client.util.MyStyle;
+import org.example.client.util.Player;
 
 import java.io.IOException;
 import java.util.*;
 
 public class BattleController {
+    @FXML
+    private TextArea historyTextArea;
     @FXML
     private Label hodLabel;
     @FXML
@@ -40,10 +45,6 @@ public class BattleController {
     private MyService myService;
 
     public void initialize(){
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            System.err.println("Uncaught exception in thread: " + thread.getName());
-            throwable.printStackTrace();
-        });
         myService = getMyService();
         hod = BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getLastMessage().getData()) == 1;
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
@@ -125,30 +126,32 @@ public class BattleController {
             progressBar.setPrefWidth(200);
             map.put(soldier.getIndex(), progressBar);
             Label label = new Label(soldier.getIndex() + " " + nameSoldier(soldier.getSoldier()));
+            MyStyle style = new MyStyle();
             label.setOnMouseClicked((event -> {
-                if(BoardSingleton.getInstance().isMySoldier(soldier.getIndex())){
-                    if(choice == 0){
-                        choice = soldier.getIndex();
-                        editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
-                        editBoardByDoingAttackSet(soldier.getCol(),soldier.getRow(),soldier.getSoldier().getDamageRadius(),true);
-                    }
-                    else{
-                        if(choice != soldier.getIndex()){
-                            SoldierWithIndexAndCoordinats tempSold = BoardSingleton.getInstance().getMySoldierByIndex(choice);
-                            editBoardByDoingMovementSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getMovementradius(), "white");
-                            editBoardByDoingAttackSet(tempSold.getCol(),tempSold.getRow(),tempSold.getSoldier().getDamageRadius(),false);
+                if(hod) {
+                    if (BoardSingleton.getInstance().isMySoldier(soldier.getIndex())) {
+                        if (choice == 0) {
                             choice = soldier.getIndex();
                             editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
-                            editBoardByDoingAttackSet(soldier.getCol(),soldier.getRow(),soldier.getSoldier().getDamageRadius(),true);
-                            return;
+                            editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getDamageRadius(), true);
+                        } else {
+                            if (choice != soldier.getIndex()) {
+                                SoldierWithIndexAndCoordinats tempSold = BoardSingleton.getInstance().getMySoldierByIndex(choice);
+                                editBoardByDoingMovementSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getMovementradius(), "white");
+                                editBoardByDoingAttackSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getDamageRadius(), false);
+                                style.setStyle("-fx-background-color: blue");
+                                choice = soldier.getIndex();
+                                editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
+                                editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getDamageRadius(), true);
+                                return;
+                            }
+                            choice = 0;
+                            editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "white");
+                            editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getDamageRadius(), false);
                         }
-                        choice = 0;
-                        editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "white");
-                        editBoardByDoingAttackSet(soldier.getCol(),soldier.getRow(),soldier.getSoldier().getDamageRadius(),false);
                     }
                 }
             }));
-            MyStyle style = new MyStyle();
             label.setOnMouseEntered((event -> {
                 if(BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())){
                     editBoardByChoicingOpponent(soldier.getCol(),soldier.getRow(),true, style);
@@ -208,17 +211,20 @@ public class BattleController {
             SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getMySoldierByCoordinates(entry.getKey(), entry.getValue());
             pane.setOnMouseClicked((event ->
             {
-                if(choice == 0){
-                    choice = soldier.getIndex();
+                if(hod) {
+                    if (choice == 0) {
+                        choice = soldier.getIndex();
 
-                    editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), "grey");
-                    editBoardByDoingAttackSet(entry.getKey(), entry.getValue(),soldier.getSoldier().getDamageRadius(),true);
-                }
-                else{
-                    if(choice != soldier.getIndex()){return;}
-                    choice = 0;
-                    editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), "white");
-                    editBoardByDoingAttackSet(entry.getKey(), entry.getValue(),soldier.getSoldier().getDamageRadius(),false);
+                        editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), "grey");
+                        editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getDamageRadius(), true);
+                    } else {
+                        if (choice != soldier.getIndex()) {
+                            return;
+                        }
+                        choice = 0;
+                        editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), "white");
+                        editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getDamageRadius(), false);
+                    }
                 }
             }));
 
@@ -245,7 +251,7 @@ public class BattleController {
                                 editBoardByDoingMovementSet(column,row,mySoldierByCoordinates.getSoldier().getMovementradius(),"white");
                                 editBoardByDoingAttackSet(column,row,damageradius,false);
                                 SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(finalTempColumn, finalTempRow);
-                                action(choice,soldier.getIndex());
+                                action(Player.You,choice,soldier.getIndex());
                                 try {
                                     ClientImpl.getInstance().sendMessage(
                                             Message.createMessage(4, new byte[]{(byte) choice, (byte) soldier.getIndex()})
@@ -279,8 +285,8 @@ public class BattleController {
         }
     }
 
-    private void action(int attacker, int defender) {
-
+    private void action(Player player,int attacker, int defender) {
+        addHistory(player, attacker, defender);
         SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().action(attacker,defender);
         map.get(defender).setProgress(
                 soldier.getSoldier().getHealth() / (soldier.getSoldier().getMAXHEALT() + 1d)
@@ -294,6 +300,31 @@ public class BattleController {
             newPane.setStyle("-fx-border-color: black");
             gridPane.add(newPane,soldier.getCol(),soldier.getRow());
         }
+    }
+
+    private void addHistory(Player player, int indexOne, int indexTwo){
+        String string = "%s: %s doing action to %s".formatted(
+                player.getString(),
+                "%s %s".formatted(indexOne, nameSoldier(BoardSingleton.getInstance().getSoldierByIndex(indexOne).getSoldier())),
+                "%s %s".formatted(indexTwo, nameSoldier(BoardSingleton.getInstance().getSoldierByIndex(indexTwo).getSoldier()))
+        );
+        if(!historyTextArea.getText().isEmpty()){
+            historyTextArea.appendText("\n");
+        }
+        historyTextArea.appendText(string);
+    }
+
+    private void addHistory(Player player, int index, int row, int column){
+        String string = "%s: %s move to (%s,%s)".formatted(
+                player.getString(),
+                "%s %s".formatted(index, nameSoldier(BoardSingleton.getInstance().getSoldierByIndex(index).getSoldier())),
+                row,
+                column
+        );
+        if(!historyTextArea.getText().isEmpty()){
+            historyTextArea.appendText("\n");
+        }
+        historyTextArea.appendText(string);
     }
 
     private void editBoardByDoingMovementSet(Integer column, Integer row, int movementradius, String color) {
@@ -318,7 +349,7 @@ public class BattleController {
                                 SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
                                 editBoardByDoingMovementSet(column,row,movementradius,"white");
                                 editBoardByDoingAttackSet(column,row, mySoldierByCoordinates.getSoldier().getDamageRadius(),false);
-                                move(choice,finalTempColumn,finalTempRow);
+                                move(Player.You,choice,finalTempColumn,finalTempRow);
                                 try {
                                     ClientImpl.getInstance().sendMessage(
                                             Message.createMessage(4, new byte[]{(byte) choice, (byte) finalTempColumn, (byte) finalTempRow})
@@ -347,17 +378,16 @@ public class BattleController {
         MyService myService = new MyService();
         myService.setOnSucceeded((event1 -> {
             Message message = ClientImpl.getInstance().getLastMessage();
-            System.out.println(Message.toString(message));
             if(message.getType() == 4) {
                 if (message.getData().length == 3) {
                     int index = message.getData()[0];
                     int column1 = message.getData()[1];
                     int row1 = message.getData()[2];
-                    move(index, column1, row1);
+                    move(Player.Opponent,index, column1, row1);
                 } else {
                     int attacker = message.getData()[0];
                     int defender = message.getData()[1];
-                    action(attacker, defender);
+                    action(Player.Opponent,attacker, defender);
                 }
 
                 boolean flag = false;
@@ -405,8 +435,8 @@ public class BattleController {
     }
 
 
-    private void move(int index, int column1, int row1){
-
+    private void move(Player player ,int index, int column1, int row1){
+        addHistory(player, index, column1, row1);
         SoldierWithIndexAndCoordinats sold = BoardSingleton.getInstance().getSoldierByIndex(index);
         int soldRow = sold.getRow();
         int soldCol = sold.getCol();
@@ -454,14 +484,11 @@ public class BattleController {
                 protected Boolean call(){
 
                     try {
-                        System.out.println("----------------------");
                         ClientImpl.getInstance().sendMessage(
                                 Message.createMessage(4, new byte[0])
                         );
                         ClientImpl.getInstance().getMessage();
-                        System.out.println(Arrays.toString(ClientImpl.getInstance().getLastMessage().getData()));
                         updateValue(true);
-                        System.out.println("Код пошёл дальше, чем updateValue");
                         return true;
                     }catch (Exception e){
                         e.printStackTrace();
