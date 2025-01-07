@@ -338,7 +338,7 @@ public class BattleController {
             }
             return false;
         }
-
+        //TODO модернизировать эту логику
         // Если цель по диагонали, то проверяем только на наличие препятствия непосредственно в клетке перед целью
         int nextX = targetRow - dx;
         int nextY = targetColumn - dy;

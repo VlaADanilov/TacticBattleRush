@@ -68,6 +68,7 @@ public class RoomController {
         }
         waitMessage();
         exitButton.setDisable(true);
+        readyButton.setDisable(true);
     }
 
     public void exit(MouseEvent mouseEvent) {
