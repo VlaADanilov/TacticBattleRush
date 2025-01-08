@@ -99,6 +99,11 @@
                   <Insets left="10.0" right="10.0" />
                </VBox.margin>
             </ImageView>
+            <Label fx:id="cntOfUnits">
+               <VBox.margin>
+                  <Insets top="25.0" />
+               </VBox.margin>
+            </Label>
          </children>
       </VBox>
    </left>

@@ -4,6 +4,7 @@ package org.example.server;
 
 import org.example.protocol.Message;
 import org.example.server.listeners.ServerEventListener;
+import org.w3c.dom.ls.LSOutput;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,13 +13,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static java.util.Map.Entry;
 
 public class SocketServerExample implements ServerExample{
     private List<ServerEventListener> listeners;
     private int port;
     private ServerSocket serverSocket;
     private boolean started;
-    private Map<String,List<Map.Entry<Socket, Boolean>>> sockets;
+    private Map<String,List<Entry<Socket, Boolean>>> sockets;
 
     public SocketServerExample(int port) {
         this.listeners = new ArrayList<>();
@@ -91,6 +93,7 @@ public class SocketServerExample implements ServerExample{
         Thread thread = new Thread(() -> {
            try{
                Message message = Message.readMessage(socket.getInputStream());
+               System.out.println(Message.toString(message));
                for(ServerEventListener listener : listeners){
                    if(listener.getType() == message.getType()){
                        listener.handle(socket, message);

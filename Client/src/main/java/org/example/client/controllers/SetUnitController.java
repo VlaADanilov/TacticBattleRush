@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class SetUnitController {
+    @FXML
+    private Label cntOfUnits;
     private MyService service;
     @FXML
     private GridPane gridPane;
@@ -41,6 +44,8 @@ public class SetUnitController {
     private ImageView horseKnightImage;
     @FXML
     private Button submitButton;
+
+    private int needCount = 0;
 
     private int cnt = 0;
 
@@ -56,7 +61,9 @@ public class SetUnitController {
 
         byte[] arr = ClientImpl.getInstance().getLastMessage().getData();
         boolean hod = arr[0] == 1;
-        for(int i = 1; i < arr.length; i += 3){
+        needCount = arr[1];
+        cntOfUnits.setText("Need " + needCount + " units");
+        for(int i = 2; i < arr.length; i += 3){
             AbstractElement element = ElementFabrica.getElement(arr[i+2]);
             BoardSingleton.getInstance().addElement(element, arr[i], arr[i+1]);
             int finalI = i;
@@ -87,21 +94,21 @@ public class SetUnitController {
                         if(choice == -1){
                             return;
                         }
-                        if(choice != 0 && cnt <= 3 && BoardSingleton.getInstance().checkForSoldier(finalJ,finalI)){
+                        if(choice != 0 && cnt <= needCount && BoardSingleton.getInstance().checkForSoldier(finalJ,finalI)){
                             BoardSingleton.getInstance().removeMySoldier(finalJ, finalI);
                             cnt--;
                             pane.getChildren().clear();
                             submitButton.setDisable(true);
                         }
                         else {
-                            if (choice != 0 && cnt < 3 && BoardSingleton.getInstance().checkForNull(finalJ, finalI)) {
+                            if (choice != 0 && cnt < needCount && BoardSingleton.getInstance().checkForNull(finalJ, finalI)) {
                                 BoardSingleton.getInstance().addMySoldier(SoldierFabrica.getSoldier(choice), finalJ, finalI);
                                 ImageView imageView = new ImageView(Images.getSoldierImage(choice));
                                 imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
                                 imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
                                 pane.getChildren().add(imageView);
                                 cnt++;
-                                if (cnt == 3) {
+                                if (cnt == needCount) {
                                     submitButton.setDisable(false);
                                 }
                             }
@@ -158,6 +165,7 @@ public class SetUnitController {
         hillerImage.setOpacity(0);
         horseKnightImage.setDisable(true);
         horseKnightImage.setOpacity(0);
+        cntOfUnits.setOpacity(0);
 
         service = new MyService();
 

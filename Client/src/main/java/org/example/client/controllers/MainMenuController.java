@@ -1,7 +1,8 @@
-package org.example.client;
+package org.example.client.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import org.example.client.HelloApplication;
 
 import java.io.IOException;
 

@@ -1,5 +1,6 @@
 package org.example.server.gameHandler.listeners;
 
+import lombok.Setter;
 import org.example.GameEntities.fabrica.SoldierFabrica;
 import org.example.GameEntities.soldiers.AbstractSoldier;
 import org.example.protocol.Message;
@@ -11,25 +12,27 @@ import java.util.*;
 public class OpponentsCoordinatsListener extends AbstractGameListener{
     private Map<Integer, Map.Entry<Byte,Byte>> map = new HashMap<>();
     private int lastKey = 0;
+    @Setter
+    private int cntOfUnits = 6;
 
     @Override
     public void handle(int i, Message message) {
-        if(map.size() < 6) {
+        if(map.size() < cntOfUnits) {
             byte[] arr = message.getData();
-            for (int j = 0; j < arr.length; j += 3) {
+            for (int j = 2; j < arr.length; j += 3) {
                 lastKey++;
-                soldierMap.put(lastKey, SoldierFabrica.getSoldier(arr[j]));
-                map.put(lastKey, new AbstractMap.SimpleEntry<Byte, Byte>(arr[j + 1], arr[j + 2]));
+                soldierMap.put(lastKey, SoldierFabrica.getSoldier(arr[j - 2]));
+                map.put(lastKey, new AbstractMap.SimpleEntry<Byte, Byte>(arr[j - 1], arr[j]));
             }
         }else{
-            byte[] array = new byte[16];
+            byte[] array = new byte[1 + cntOfUnits / 2 + cntOfUnits * 2];
             array[0] = (byte) i;
             if(i == 1){
-                array[1] = 1;
-                array[2] = 2;
-                array[3] = 3;
-                int now = 4;
-                for (int j = 4; j < 7; j += 1) {
+                for(int j = 1; j <= cntOfUnits / 2; j++){
+                    array[j] = (byte) j;
+                }
+                int now = 1 + cntOfUnits / 2;
+                for (int j = 1 + cntOfUnits / 2; j <= cntOfUnits; j += 1) {
                     array[now] = (byte) j; now++;
                     array[now] = (byte) soldierMap.get(j).getINDEX(); now++;
                     array[now] = map.get(j).getKey(); now++;
@@ -44,11 +47,11 @@ public class OpponentsCoordinatsListener extends AbstractGameListener{
                 }
             }
             else{
-                array[1] = 4;
-                array[2] = 5;
-                array[3] = 6;
-                int now = 4;
-                for (int j = 1; j < 4; j += 1) {
+                for(int j = 1; j <= cntOfUnits / 2; j++){
+                    array[j] = (byte) (j + (cntOfUnits / 2));
+                }
+                int now = 1 + cntOfUnits / 2;
+                for (int j = 1; j <= cntOfUnits / 2; j += 1) {
                     array[now] = (byte) j; now++;
                     array[now] = (byte) soldierMap.get(j).getINDEX(); now++;
                     array[now] = map.get(j).getKey(); now++;

@@ -10,9 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0"
-            xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.BattleController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.BattleController">
    <top>
       <Label text="Tactic Battle Rush" BorderPane.alignment="CENTER">
          <font>
@@ -80,7 +78,7 @@
             <Insets left="20.0" />
          </BorderPane.margin>
          <children>
-            <VBox fx:id="healthBox" prefHeight="200.0" prefWidth="100.0" />
+            <VBox fx:id="healthBox" prefWidth="100.0" />
             <Label fx:id="hodLabel">
                <font>
                   <Font size="15.0" />

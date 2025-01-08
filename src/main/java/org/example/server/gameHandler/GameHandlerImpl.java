@@ -25,9 +25,10 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     private List<AbstractGameListener> listeners;
     private int hod;
     private Map<Integer, AbstractSoldier> soldierMap = new HashMap<>();
+    private int cntOfUnits = 3;
 
 
-    public GameHandlerImpl(Socket opponentOne, Socket opponentTwo, ServerExample serverExample) {
+    public GameHandlerImpl(Socket opponentOne, Socket opponentTwo, ServerExample serverExample, int cntOfUnits) {
         this.opponentOne = opponentOne;
         this.opponentTwo = opponentTwo;
         this.server = serverExample;
@@ -35,12 +36,14 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
 
         Byte[] elementsCoordinats = initBoard();
 
-        sendStartMessage(elementsCoordinats);
-
         listeners = new ArrayList<>();
-        AbstractGameListener opponentsCoordinatsListener = new OpponentsCoordinatsListener();
+        OpponentsCoordinatsListener opponentsCoordinatsListener = new OpponentsCoordinatsListener();
         opponentsCoordinatsListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
         listeners.add(opponentsCoordinatsListener);
+        if(cntOfUnits != 0) {
+            opponentsCoordinatsListener.setCntOfUnits(cntOfUnits * 2);
+            this.cntOfUnits = cntOfUnits;
+        }
 
         AbstractGameListener userActionAttackListenerListener = new UserActionAttackListener();
         userActionAttackListenerListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
@@ -53,16 +56,20 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         AbstractGameListener userActionMoveAndAttackListenerListener = new UserActionMoveAndAttackListener();
         userActionMoveAndAttackListenerListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
         listeners.add(userActionMoveAndAttackListenerListener);
+
+        sendStartMessage(elementsCoordinats);
     }
 
     private void sendStartMessage(Byte[] bytes) {
-        ByteBuffer buffer1 = ByteBuffer.allocate(bytes.length + 1);
-        ByteBuffer buffer2 = ByteBuffer.allocate(bytes.length + 1);
+        ByteBuffer buffer1 = ByteBuffer.allocate(bytes.length + 2);
+        ByteBuffer buffer2 = ByteBuffer.allocate(bytes.length + 2);
         buffer1.put(Byte.parseByte("1"));
         buffer2.put(Byte.parseByte("2"));
-        for(int i = 0; i < bytes.length; i++){
-            buffer1.put(bytes[i]);
-            buffer2.put(bytes[i]);
+        buffer1.put((byte) cntOfUnits);
+        buffer2.put((byte) cntOfUnits);
+        for (Byte aByte : bytes) {
+            buffer1.put(aByte);
+            buffer2.put(aByte);
         }
         try {
             server.sendMessage(opponentOne, Message.createMessage(Message.TYPE2, buffer1.array()));
@@ -130,7 +137,6 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     }
 
     private int whoWinner(){
-        Map<Integer, AbstractSoldier> soldierMap1 = soldierMap;
         int summaHealth = 0;
         for(int i = 1; i <= soldierMap.size() / 2; i++){
             summaHealth += soldierMap.get(i).getHealth();

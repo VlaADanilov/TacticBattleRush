@@ -2,6 +2,7 @@ package org.example.client.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import org.example.client.connectors.ClientImpl;
@@ -10,8 +11,12 @@ import org.example.client.HelloApplication;
 import org.example.client.service.MessageWaitingService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RoomController {
+    @FXML
+    private ComboBox<Byte> countOfUnitsComboBox;
     @FXML
     private Button exitButton;
     @FXML
@@ -42,6 +47,7 @@ public class RoomController {
         if(stat.equals("Занято")){
             readyButton.setDisable(true);
             messageNeeded = false;
+            countOfUnitsComboBox.setDisable(true);
         }
     }
 
@@ -59,10 +65,13 @@ public class RoomController {
         service.start();
     }
 
+
     public void ready(MouseEvent mouseEvent) {
         ClientImpl client = ClientImpl.getInstance();
+        Byte selectedValue = countOfUnitsComboBox.getValue();
+        if(selectedValue == null) selectedValue = 0;
         try {
-            client.sendMessage(Message.createMessage(Message.TYPE2, new byte[]{1}));
+            client.sendMessage(Message.createMessage(Message.TYPE2, new byte[]{1,selectedValue}));
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }

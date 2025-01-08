@@ -26,7 +26,8 @@ public class HelloController {
             ClientImpl.init(InetAddress.getByName("127.0.0.1"), 50000);
             ClientImpl client = ClientImpl.getInstance();
             client.connect();
-            client.sendMessage(Message.createMessage(Message.TYPE1, text.getBytes()));
+            Message message = Message.createMessage(Message.TYPE1, text.getBytes());
+            client.sendMessage(message);
             client.getMessage();
             HelloApplication.changeScene("room.fxml");
         }

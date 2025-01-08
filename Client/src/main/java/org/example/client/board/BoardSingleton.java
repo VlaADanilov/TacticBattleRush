@@ -75,10 +75,12 @@ public class BoardSingleton {
     public int readCoordinateMessage(byte[] arr){
         int ret = arr[0];
 
-        for(int i = 1; i < 4; i++){
+        int cntOfUnitsOnePerson = mySoldiers.size();
+
+        for(int i = 1; i <= cntOfUnitsOnePerson; i++){
             mySoldiers.get(i - 1).setIndex(arr[i]);
         }
-        for(int i = 4; i < arr.length; i+=4){
+        for(int i = cntOfUnitsOnePerson + 1; i < arr.length; i+=4){
             AbstractSoldier abstractSoldier = SoldierFabrica.getSoldier(arr[i+1]);
             SoldierWithIndexAndCoordinats soldier = new SoldierWithIndexAndCoordinats(
                     abstractSoldier,
@@ -86,7 +88,6 @@ public class BoardSingleton {
                     arr[i+2]
             );
             soldier.setIndex(arr[i]);
-            List<SoldierWithIndexAndCoordinats> opponentSoldiers1 = opponentSoldiers;
             opponentSoldiers.add(soldier);
             board[arr[i+3]][arr[i+2]] = abstractSoldier;
         }
