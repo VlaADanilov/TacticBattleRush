@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.text.Text?>
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.client.MainMenuController"
+           prefHeight="400.0" prefWidth="600.0" styleClass="main-menu">
+
+    <Text text="TacticBattleRush" styleClass="game-title" />
+
+    <Button fx:id="startButton" text="Начать игру" styleClass="menu-button"  />
+
+</StackPane>
