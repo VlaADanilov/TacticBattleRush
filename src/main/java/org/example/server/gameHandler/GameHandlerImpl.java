@@ -3,16 +3,12 @@ package org.example.server.gameHandler;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.GameEntities.elements.AbstractElement;
 import org.example.GameEntities.soldiers.AbstractSoldier;
 import org.example.protocol.Message;
 import org.example.server.ServerExample;
-import org.example.server.gameHandler.listeners.AbstractGameListener;
-import org.example.server.gameHandler.listeners.OpponentsCoordinatsListener;
-import org.example.server.gameHandler.listeners.UserActionListener;
+import org.example.server.gameHandler.listeners.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -46,9 +42,17 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         opponentsCoordinatsListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
         listeners.add(opponentsCoordinatsListener);
 
-        AbstractGameListener userActionListener = new UserActionListener();
-        userActionListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
-        listeners.add(userActionListener);
+        AbstractGameListener userActionAttackListenerListener = new UserActionAttackListener();
+        userActionAttackListenerListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
+        listeners.add(userActionAttackListenerListener);
+
+        AbstractGameListener userActionMoveListenerListener = new UserActionMoveListener();
+        userActionMoveListenerListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
+        listeners.add(userActionMoveListenerListener);
+
+        AbstractGameListener userActionMoveAndAttackListenerListener = new UserActionMoveAndAttackListener();
+        userActionMoveAndAttackListenerListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
+        listeners.add(userActionMoveAndAttackListenerListener);
     }
 
     private void sendStartMessage(Byte[] bytes) {
@@ -61,8 +65,8 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
             buffer2.put(bytes[i]);
         }
         try {
-            server.sendMessage(opponentOne, Message.createMessage(2, buffer1.array()));
-            server.sendMessage(opponentTwo, Message.createMessage(2, buffer2.array()));
+            server.sendMessage(opponentOne, Message.createMessage(Message.TYPE2, buffer1.array()));
+            server.sendMessage(opponentTwo, Message.createMessage(Message.TYPE2, buffer2.array()));
         }catch (Exception e){
             throw new RuntimeException(e);
         }
@@ -95,11 +99,11 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         }
         try {
             if (winner == 1) {
-                server.sendMessage(opponentOne, Message.createMessage(5, new byte[]{1}));
-                server.sendMessage(opponentTwo, Message.createMessage(5, new byte[]{2}));
+                server.sendMessage(opponentOne, Message.createMessage(Message.TYPE5, new byte[]{1}));
+                server.sendMessage(opponentTwo, Message.createMessage(Message.TYPE5, new byte[]{2}));
             } else {
-                server.sendMessage(opponentTwo, Message.createMessage(5, new byte[]{1}));
-                server.sendMessage(opponentOne, Message.createMessage(5, new byte[]{2}));
+                server.sendMessage(opponentTwo, Message.createMessage(Message.TYPE5, new byte[]{1}));
+                server.sendMessage(opponentOne, Message.createMessage(Message.TYPE5, new byte[]{2}));
             }
         }catch (Exception e){
             throw new RuntimeException(e);

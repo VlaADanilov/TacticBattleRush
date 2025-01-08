@@ -1,6 +1,9 @@
 package org.example.protocol;
 
-import org.example.protocol.exception.*;
+
+import org.example.protocol.exception.ExceedingTheMaximumLengthException;
+import org.example.protocol.exception.FirstBytesNotEqualsException;
+import org.example.protocol.exception.WrongMessageTypeException;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -8,12 +11,15 @@ import java.util.Arrays;
 
 //Message contents: [FIRST BYTES (2), MESSAGE TYPE(4), DATA LENGTH(4), DATA(?)]
 public class Message {
-    public static final int TYPE1 = 1;
-    public static final int TYPE2 = 2;
-    public static final int TYPE3 = 3;
-    public static final int TYPE4 = 4;
-    public static final int TYPE5 = 5;
-    public static final int TYPE6 = 6;
+    public static final int TYPE0 = 0;
+    public static final int TYPE1 = 1; // подключение к комнате и результат подключения
+    public static final int TYPE2 = 2; // готовность и старт игры
+    public static final int TYPE3 = 3; // координаты моих персонажей и координаты персонажей соперника
+    public static final int TYPE_ATTACK = 4; // атака
+    public static final int TYPE5 = 5; // результат игры
+    public static final int TYPE_MOVE = 6; // передвижение
+    public static final int TYPE_ATTACK_AND_MOVE = 7; // передвижение + атака
+
 
     private static final int MAX_LENGTH = 1000;
 
@@ -32,9 +38,10 @@ public class Message {
                     + " bytes length. Maximum is " + MAX_LENGTH + "."
             );
         }
-        if(messageType != TYPE1 && messageType != TYPE2
-        && messageType != TYPE3 && messageType != TYPE4
-        && messageType != TYPE5 && messageType != TYPE6){
+        if(messageType != TYPE0 && messageType != TYPE1 && messageType != TYPE2
+                && messageType != TYPE3 && messageType != TYPE_ATTACK
+                && messageType != TYPE5 && messageType != TYPE_MOVE
+                && messageType != TYPE_ATTACK_AND_MOVE){
             throw new WrongMessageTypeException("Wrong message type");
         }
         return new Message(messageType, data);
@@ -94,37 +101,41 @@ public class Message {
         return sb.toString();
     }
 
-    public static Message readMessage(InputStream in){
+    public synchronized static Message readMessage(InputStream in){
         byte[] buffer = new byte[MAX_LENGTH];// Not the most optimized approach
         try{
-            in.read(buffer, 0, START_BYTES.length);//Block Thread here
-            if(!Arrays.equals(
-                    Arrays.copyOfRange(buffer, 0, START_BYTES.length),
-                    START_BYTES)){
-                throw new FirstBytesNotEqualsException(
-                        "Message first bytes must be " + Arrays.toString(START_BYTES)
-                );
+            synchronized (in) {
+                in.read(buffer, 0, START_BYTES.length);//Block Thread here
+                if (!Arrays.equals(
+                        Arrays.copyOfRange(buffer, 0, START_BYTES.length),
+                        START_BYTES)) {
+                    throw new FirstBytesNotEqualsException(
+                            "Message first bytes must be " + Arrays.toString(START_BYTES)
+                    );
+                }
+                in.read(buffer, 0, 4);//Block Thread here
+                int messageType = ByteBuffer.wrap(buffer, 0, 4).getInt();
+                if (messageType != TYPE0 && messageType != TYPE1 && messageType != TYPE2
+                        && messageType != TYPE3 && messageType != TYPE_ATTACK
+                        && messageType != TYPE5 && messageType != TYPE_MOVE
+                        && messageType != TYPE_ATTACK_AND_MOVE) {
+                    throw new WrongMessageTypeException("Wrong message type: " + messageType + ".");
+                }
+                in.read(buffer, 0, 4);//Block Thread here
+                int messageLength = ByteBuffer.wrap(buffer, 0, 4).getInt();
+                if (messageLength > MAX_LENGTH) {
+                    throw new ExceedingTheMaximumLengthException(
+                            "Message can't be " + messageLength
+                                    + " bytes length. Maximum is " + MAX_LENGTH + "."
+                    );
+                }
+                in.read(buffer, 0, messageLength);//Can end before messageLength
+                return new Message(messageType, Arrays.copyOfRange(buffer, 0, messageLength));
             }
-            in.read(buffer, 0, 4);//Block Thread here
-            int messageType = ByteBuffer.wrap(buffer, 0, 4).getInt();
-            if(messageType != TYPE1 && messageType != TYPE2
-                    && messageType != TYPE3 && messageType != TYPE4
-                    && messageType != TYPE5 && messageType != TYPE6){
-                throw new WrongMessageTypeException("Wrong message type: " + messageType + ".");
-            }
-            in.read(buffer, 0, 4);//Block Thread here
-            int messageLength = ByteBuffer.wrap(buffer, 0, 4).getInt();
-            if(messageLength > MAX_LENGTH){
-                throw new ExceedingTheMaximumLengthException(
-                        "Message can't be " + messageLength
-                                + " bytes length. Maximum is " + MAX_LENGTH + "."
-                );
-            }
-            in.read(buffer, 0, messageLength);//Can end before messageLength
-            return new Message(messageType, Arrays.copyOfRange(buffer, 0, messageLength));
         }
         catch(Exception e){
             throw new IllegalArgumentException("Can't read message", e);
         }
+
     }
 }

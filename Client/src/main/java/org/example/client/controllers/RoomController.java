@@ -62,7 +62,7 @@ public class RoomController {
     public void ready(MouseEvent mouseEvent) {
         ClientImpl client = ClientImpl.getInstance();
         try {
-            client.sendMessage(Message.createMessage(2, new byte[]{1}));
+            client.sendMessage(Message.createMessage(Message.TYPE2, new byte[]{1}));
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }
@@ -75,7 +75,7 @@ public class RoomController {
         ClientImpl client = ClientImpl.getInstance();
         try {
             if(messageNeeded) {
-                client.sendMessage(Message.createMessage(2, new byte[]{2}));
+                client.sendMessage(Message.createMessage(Message.TYPE2, new byte[]{2}));
             }
             ClientImpl.getInstance().disconnect();
             HelloApplication.changeScene("hello-view.fxml");

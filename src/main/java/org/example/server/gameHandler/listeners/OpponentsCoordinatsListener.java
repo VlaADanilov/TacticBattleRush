@@ -36,7 +36,7 @@ public class OpponentsCoordinatsListener extends AbstractGameListener{
                     array[now] = map.get(j).getValue(); now++;
                 }
                 try {
-                    server.sendMessage(opponentOne, Message.createMessage(3, array));
+                    server.sendMessage(opponentOne, Message.createMessage(Message.TYPE3, array));
                 } catch (ExceedingTheMaximumLengthException e) {
                     throw new RuntimeException(e);
                 } catch (WrongMessageTypeException e) {
@@ -55,7 +55,7 @@ public class OpponentsCoordinatsListener extends AbstractGameListener{
                     array[now] = map.get(j).getValue(); now++;
                 }
                 try {
-                    server.sendMessage(opponentTwo, Message.createMessage(3, array));
+                    server.sendMessage(opponentTwo, Message.createMessage(Message.TYPE3, array));
                 } catch (ExceedingTheMaximumLengthException e) {
                     throw new RuntimeException(e);
                 } catch (WrongMessageTypeException e) {

@@ -263,7 +263,7 @@ public class BattleController {
                                         if (array == null) {
                                             try {
                                                 ClientImpl.getInstance().sendMessage(
-                                                        Message.createMessage(4, new byte[]{(byte) choice, (byte) soldier.getIndex()})
+                                                        Message.createMessage(Message.TYPE_ATTACK, new byte[]{(byte) choice, (byte) soldier.getIndex()})
                                                 );
                                             } catch (ExceedingTheMaximumLengthException e) {
                                                 throw new RuntimeException(e);
@@ -275,7 +275,7 @@ public class BattleController {
                                             array[4] = (byte) soldier.getIndex();
                                             try {
                                                 ClientImpl.getInstance().sendMessage(
-                                                        Message.createMessage(4, array)
+                                                        Message.createMessage(Message.TYPE_ATTACK_AND_MOVE, array)
                                                 );
                                             } catch (ExceedingTheMaximumLengthException e) {
                                                 throw new RuntimeException(e);
@@ -468,7 +468,7 @@ public class BattleController {
 
                                         try {
                                             ClientImpl.getInstance().sendMessage(
-                                                    Message.createMessage(4, new byte[]{(byte) choice, (byte) finalTempColumn, (byte) finalTempRow})
+                                                    Message.createMessage(Message.TYPE_MOVE, new byte[]{(byte) choice, (byte) finalTempColumn, (byte) finalTempRow})
                                             );
                                         } catch (ExceedingTheMaximumLengthException e) {
                                             throw new RuntimeException(e);
@@ -498,25 +498,27 @@ public class BattleController {
         MyService myService = new MyService();
         myService.setOnSucceeded((event1 -> {
             Message message = ClientImpl.getInstance().getLastMessage();
-            if (message.getType() == 4) {
-                if (message.getData().length == 3) {
-                    int index = message.getData()[0];
-                    int column1 = message.getData()[1];
-                    int row1 = message.getData()[2];
-                    move(Player.Opponent, index, column1, row1);
-                } else {
-                    if (message.getData().length == 2) {
-                        int attacker = message.getData()[0];
-                        int defender = message.getData()[1];
-                        action(Player.Opponent, attacker, defender);
-                    } else {
+            if(message.getType() != Message.TYPE5) {
+                if (message.getType() == Message.TYPE_ATTACK){
+                    int attacker = message.getData()[0];
+                    int defender = message.getData()[1];
+                    action(Player.Opponent, attacker, defender);
+                }else{
+                    if(message.getType() == Message.TYPE_MOVE){
                         int index = message.getData()[0];
                         int column1 = message.getData()[1];
                         int row1 = message.getData()[2];
                         move(Player.Opponent, index, column1, row1);
-                        int attacker = message.getData()[3];
-                        int defender = message.getData()[4];
-                        action(Player.Opponent, attacker, defender);
+                    }else{
+                        if(message.getType() == Message.TYPE_ATTACK_AND_MOVE){
+                            int index = message.getData()[0];
+                            int column1 = message.getData()[1];
+                            int row1 = message.getData()[2];
+                            move(Player.Opponent, index, column1, row1);
+                            int attacker = message.getData()[3];
+                            int defender = message.getData()[4];
+                            action(Player.Opponent, attacker, defender);
+                        }
                     }
                 }
 
@@ -543,20 +545,19 @@ public class BattleController {
                 myService.reset();
             } else {
                 //TODO нужна нормальная логика
-                if (message.getType() == 5) {
-                    if (message.getData()[0] == 1) {
-                        System.out.println("Ты выиграл");
-                    } else {
-                        System.out.println("Ты проиграл");
-                    }
-                    BoardSingleton.getInstance().clear();
-                    ClientImpl.getInstance().disconnect();
-                    try {
-                        HelloApplication.changeScene("hello-view.fxml");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                if (message.getData()[0] == 1) {
+                    System.out.println("Ты выиграл");
+                } else {
+                    System.out.println("Ты проиграл");
                 }
+                BoardSingleton.getInstance().clear();
+                ClientImpl.getInstance().disconnect();
+                try {
+                    HelloApplication.changeScene("hello-view.fxml");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
         }));
         myService.setOnFailed((event2) -> myService.getException().printStackTrace());
@@ -614,7 +615,7 @@ public class BattleController {
 
                     try {
                         ClientImpl.getInstance().sendMessage(
-                                Message.createMessage(4, new byte[0])
+                                Message.createMessage(Message.TYPE0, new byte[0])
                         );
                         ClientImpl.getInstance().getMessage();
                         updateValue(true);

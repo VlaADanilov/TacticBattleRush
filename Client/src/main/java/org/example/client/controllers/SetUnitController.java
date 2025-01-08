@@ -147,7 +147,7 @@ public class SetUnitController {
 
     public void next(ActionEvent actionEvent) throws ExceedingTheMaximumLengthException, WrongMessageTypeException, IOException {
         ClientImpl.getInstance().sendMessage(
-                Message.createMessage(3, BoardSingleton.getInstance().getMySoldiersMessage())
+                Message.createMessage(Message.TYPE3, BoardSingleton.getInstance().getMySoldiersMessage())
         );
         choice = -1;
         heavyKnightImage.setDisable(true);
