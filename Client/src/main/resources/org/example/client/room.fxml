@@ -11,7 +11,7 @@
 <?import javafx.collections.FXCollections?>
 <?import java.lang.Integer?>
 <?import java.lang.Byte?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.RoomController">
+<BorderPane styleClass="main-menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.RoomController">
    <top>
       <Label text="Tactic Battle Rush" BorderPane.alignment="CENTER">
          <font>
@@ -54,12 +54,12 @@
                   </FXCollections>
                </items>
             </ComboBox>
-            <Button fx:id="readyButton" mnemonicParsing="false" onMouseClicked="#ready" text="I`m ready">
+            <Button styleClass="my_button" fx:id="readyButton" mnemonicParsing="false" onMouseClicked="#ready" text="I`m ready">
                <VBox.margin>
                   <Insets top="25.0" />
                </VBox.margin>
             </Button>
-            <Button fx:id="exitButton" mnemonicParsing="false" onMouseClicked="#exit" text="Exit">
+            <Button styleClass="my_button" fx:id="exitButton" mnemonicParsing="false" onMouseClicked="#exit" text="Exit">
                <VBox.margin>
                   <Insets top="25.0" />
                </VBox.margin>

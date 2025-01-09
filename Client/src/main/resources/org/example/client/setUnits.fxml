@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.SetUnitController">
+<BorderPane styleClass="main-menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.SetUnitController">
    <top>
       <Label text="Tactic Battle Rush" BorderPane.alignment="CENTER">
          <font>
@@ -108,7 +108,7 @@
       </VBox>
    </left>
    <right>
-      <Button fx:id="submitButton" mnemonicParsing="false" onAction="#next" text="Submit" BorderPane.alignment="CENTER">
+      <Button styleClass="my_button" fx:id="submitButton" mnemonicParsing="false" onAction="#next" text="Submit" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets right="20.0" />
          </BorderPane.margin>

@@ -28,6 +28,7 @@ public class HelloApplication extends Application {
     public static void changeScene(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(fxml));
         Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
+        scene.getStylesheets().add(HelloApplication.class.getResource("/styles/style.css").toExternalForm());
         primaryStage.setTitle("Tactic battle rush");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);

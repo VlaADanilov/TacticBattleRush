@@ -1,5 +1,5 @@
 .main-menu {
-    -fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e); /* Темный синий градиент */
+    -fx-background-color: linear-gradient(to bottom, #8DC0FAFF, #EFB8B8FF); /* Темный синий градиент */
     -fx-alignment: center; /* Выравнивание по центру */
 }
 
@@ -31,4 +31,24 @@
 
 .menu-button:pressed {
     -fx-background-color: linear-gradient(to bottom, #1B5E20, #388E3C); /* Светлее при нажатии */
+}
+
+.my_button {
+    -fx-background-color: #3498db; /* Цвет фона */
+    -fx-text-fill: white; /* Цвет текста */
+    -fx-font-size: 14px; /* Размер шрифта */
+    -fx-font-weight: bold; /* Жирный шрифт */
+    -fx-padding: 10px 20px; /* Внутренние отступы */
+    -fx-border-radius: 5px; /* Скругление углов */
+    -fx-cursor: hand; /* Курсор при наведении */
+    -fx-border-color: transparent; /* Убираем обводку */
+    -fx-transition: background-color 0.3s; /* Плавный переход цвета фона */
+}
+
+.my_button:hover {
+    -fx-background-color: #2980b9; /* Цвет фона при наведении */
+}
+
+.my_button:pressed {
+    -fx-background-color: #1F618D; /* Цвет фона при нажатии */
 }
