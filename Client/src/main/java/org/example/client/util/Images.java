@@ -10,6 +10,7 @@ public class Images {
             case 2 -> new Image(Images.class.getResourceAsStream("/image/лук.png"));
             case 3 -> new Image(Images.class.getResourceAsStream("/image/лечение.png"));
             case 4 -> new Image(Images.class.getResourceAsStream("/image/лошадь.png"));
+            case 5 -> new Image(Images.class.getResourceAsStream("/image/мортира.png"));
             default -> throw new IllegalStateException("Unexpected value: " + i);
         };
     }

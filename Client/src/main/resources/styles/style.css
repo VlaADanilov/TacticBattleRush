@@ -34,6 +34,7 @@
 }
 
 .my_button {
+    -fx-background-radius: 6px;
     -fx-background-color: #3498db; /* Цвет фона */
     -fx-text-fill: white; /* Цвет текста */
     -fx-font-size: 14px; /* Размер шрифта */
@@ -41,7 +42,7 @@
     -fx-padding: 10px 20px; /* Внутренние отступы */
     -fx-border-radius: 5px; /* Скругление углов */
     -fx-cursor: hand; /* Курсор при наведении */
-    -fx-border-color: transparent; /* Убираем обводку */
+    -fx-border-color: black; /* Убираем обводку */
     -fx-transition: background-color 0.3s; /* Плавный переход цвета фона */
 }
 

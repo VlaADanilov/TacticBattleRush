@@ -1,10 +1,11 @@
 package org.example.client.GameEntities.soldiers;
 
-public class HeavyKnight extends AbstractRadiusAttacker {
-    public HeavyKnight() {
-        super(1,25,1);
-        health=25;
-        damage=7;
+public class Mortar extends AbstractRadiusAreaAttacker{
+
+    public Mortar() {
+        super(5, 10, 10, 3);
+        health=10;
+        damage=5;
         movementradius=1;
     }
 

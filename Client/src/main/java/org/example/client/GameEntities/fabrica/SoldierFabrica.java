@@ -1,5 +1,7 @@
 package org.example.client.GameEntities.fabrica;
 
+
+
 import org.example.client.GameEntities.soldiers.*;
 
 import java.util.Random;
@@ -24,7 +26,7 @@ public class SoldierFabrica {
 
     public static synchronized AbstractSoldier getSoldier(){
         Random rand = new Random();
-        int i = rand.nextInt(1,4 + 1);
+        int i = rand.nextInt(1,5 + 1);
         return getSoldier(i);
     }
     public static synchronized AbstractSoldier getSoldier(int i){
@@ -33,8 +35,13 @@ public class SoldierFabrica {
             case 1 -> getHeavyKnight();
             case 3 -> getHiller();
             case 4 -> getHorseKnight();
+            case 5 -> getMortar();
             default -> null;
         };
         return soldier;
+    }
+
+    private static AbstractSoldier getMortar() {
+        return new Mortar();
     }
 }

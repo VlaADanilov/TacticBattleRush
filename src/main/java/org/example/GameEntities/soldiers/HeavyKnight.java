@@ -1,12 +1,11 @@
 package org.example.GameEntities.soldiers;
 
-public class HeavyKnight extends AbstractSoldier{
+public class HeavyKnight extends AbstractRadiusAttacker {
     public HeavyKnight() {
-        super(1);
+        super(1,25,1);
         health=25;
         damage=7;
         movementradius=1;
-        damageRadius=1;
     }
 
     @Override

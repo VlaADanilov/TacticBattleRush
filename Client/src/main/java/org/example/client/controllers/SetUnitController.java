@@ -30,6 +30,8 @@ import java.util.Objects;
 
 public class SetUnitController {
     @FXML
+    private ImageView mortarImage;
+    @FXML
     private Label cntOfUnits;
     private MyService service;
     @FXML
@@ -56,6 +58,7 @@ public class SetUnitController {
         archerImage.setImage(Images.getSoldierImage(2));
         hillerImage.setImage(Images.getSoldierImage(3));
         horseKnightImage.setImage(Images.getSoldierImage(4));
+        mortarImage.setImage(Images.getSoldierImage(5));
 
         submitButton.setDisable(true);
 
@@ -120,34 +123,34 @@ public class SetUnitController {
         }
     }
 
+    private void allOpacity(double value){
+        mortarImage.setOpacity(value);
+        heavyKnightImage.setOpacity(value);
+        archerImage.setOpacity(value);
+        hillerImage.setOpacity(value);
+        horseKnightImage.setOpacity(value);
+    }
+
     public void choiseHeavyKinght(MouseEvent mouseEvent) {
-        archerImage.setOpacity(0.5d);
-        hillerImage.setOpacity(0.5d);
-        horseKnightImage.setOpacity(0.5d);
+        allOpacity(0.5d);
         choice = 1;
         heavyKnightImage.setOpacity(1);
     }
 
     public void choiceArcher(MouseEvent mouseEvent) {
-        heavyKnightImage.setOpacity(0.5d);
-        hillerImage.setOpacity(0.5d);
-        horseKnightImage.setOpacity(0.5d);
+        allOpacity(0.5d);
         choice = 2;
         archerImage.setOpacity(1);
     }
 
     public void choiseHiller(MouseEvent mouseEvent) {
-        archerImage.setOpacity(0.5d);
-        heavyKnightImage.setOpacity(0.5d);
-        horseKnightImage.setOpacity(0.5d);
+        allOpacity(0.5d);
         choice = 3;
         hillerImage.setOpacity(1);
     }
 
     public void choiseHorse(MouseEvent mouseEvent) {
-        archerImage.setOpacity(0.5d);
-        hillerImage.setOpacity(0.5d);
-        heavyKnightImage.setOpacity(0.5d);
+        allOpacity(0.5d);
         choice = 4;
         horseKnightImage.setOpacity(1);
     }
@@ -157,6 +160,8 @@ public class SetUnitController {
                 Message.createMessage(Message.TYPE3, BoardSingleton.getInstance().getMySoldiersMessage())
         );
         choice = -1;
+        mortarImage.setDisable(true);
+        mortarImage.setOpacity(0);
         heavyKnightImage.setDisable(true);
         heavyKnightImage.setOpacity(0);
         archerImage.setDisable(true);
@@ -178,6 +183,12 @@ public class SetUnitController {
         });
 
         service.start();
+    }
+
+    public void choiceMortar(MouseEvent mouseEvent) {
+        allOpacity(0.5d);
+        choice = 5;
+        mortarImage.setOpacity(1);
     }
 
     private static class MyService extends Service<Boolean> {

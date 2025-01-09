@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.util.Pair;
 import org.example.client.GameEntities.AbstractEntity;
 import org.example.client.GameEntities.elements.AbstractElement;
 import org.example.client.GameEntities.soldiers.*;
@@ -132,21 +133,21 @@ public class BattleController {
                         if (choice == 0) {
                             choice = soldier.getIndex();
                             editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
-                            editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getDamageRadius(), true);
+                            editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), true);
                         } else {
                             if (choice != soldier.getIndex()) {
                                 SoldierWithIndexAndCoordinats tempSold = BoardSingleton.getInstance().getMySoldierByIndex(choice);
                                 editBoardByDoingMovementSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getMovementradius(), BOARD_COLOR);
-                                editBoardByDoingAttackSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getDamageRadius(), false);
+                                editBoardByDoingAttackSet(tempSold.getCol(), tempSold.getRow(), false);
                                 style.setStyle("-fx-background-color: blue");
                                 choice = soldier.getIndex();
                                 editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
-                                editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getDamageRadius(), true);
+                                editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), true);
                                 return;
                             }
                             choice = 0;
                             editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), BOARD_COLOR);
-                            editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getDamageRadius(), false);
+                            editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), false);
                         }
                     }
                 }
@@ -215,14 +216,14 @@ public class BattleController {
                         choice = soldier.getIndex();
 
                         editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), "grey");
-                        editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getDamageRadius(), true);
+                        editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), true);
                     } else {
                         if (choice != soldier.getIndex()) {
                             return;
                         }
                         choice = 0;
                         editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), BOARD_COLOR);
-                        editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getDamageRadius(), false);
+                        editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), false);
                     }
                 }
             }));
@@ -230,7 +231,12 @@ public class BattleController {
         }
     }
 
-    private int editBoardByDoingAttackSet(Integer column, Integer row, int damageradius, boolean flag) {
+    private int editBoardByDoingAttackSet(Integer column, Integer row, boolean flag) {
+        SoldierWithIndexAndCoordinats soldier1 = BoardSingleton.getInstance().getSoldier(column, row);
+        int damageradius = 0;
+        if(soldier1.getSoldier() instanceof AbstractRadiusAttacker) {
+            damageradius = ((AbstractRadiusAttacker) soldier1.getSoldier()).getDamageRadius();
+        }
         int result = 0;
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
         for (int tempColumn = column - damageradius; tempColumn <= column + damageradius; tempColumn++) {
@@ -250,14 +256,15 @@ public class BattleController {
                                 && BoardSingleton.getInstance().isOpponentSoldier(soldierIndex))
                                 || (!SoldierSpeciality.isActionForOpponent(BoardSingleton.getInstance().getSoldier(column, row).getSoldier())
                                 && BoardSingleton.getInstance().isMySoldier(soldierIndex))) {
-                            if (!hasObstacleInPathAttack(finalTempRow, finalTempColumn, row, column)) {
+                            //if (!hasObstacleInPathAttack(finalTempRow, finalTempColumn, row, column)) {
+                            if (!hasObstacleInPathAttack(finalTempRow, finalTempColumn, BoardSingleton.getInstance().getSoldier(column,row).getIndex())) {
                                 result++;
                                 pane.setStyle("-fx-background-color: #CF4658FF");
                                 pane.setOnMouseClicked((event) -> {
                                     if (hod && choice != 0) {
                                         SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
                                         editBoardByDoingMovementSet(column, row, mySoldierByCoordinates.getSoldier().getMovementradius(), BOARD_COLOR);
-                                        editBoardByDoingAttackSet(column, row, damageradius, false);
+                                        editBoardByDoingAttackSet(column, row, false);
                                         SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(finalTempColumn, finalTempRow);
                                         action(Player.You, choice, soldier.getIndex());
                                         if (array == null) {
@@ -336,6 +343,9 @@ public class BattleController {
             if(Math.abs(targetRow - unitRow) == 1 && Math.abs(targetColumn - unitColumn) == 1) {
                 return false;
             }
+            if(isObstacle(targetRow - dx, targetColumn - dy)) {
+                return true;
+            }
             if(isObstacle(targetRow - dx, targetColumn) || isObstacle(targetRow, targetColumn - dy)) {
                 if(isObstacle(targetRow - dx, targetColumn)){
                     return Math.abs(targetColumn - unitColumn) < Math.abs(targetRow - unitRow);
@@ -345,6 +355,11 @@ public class BattleController {
             }
             return hasObstacleInPathAttack(targetRow - dx, targetColumn - dy, unitRow, unitColumn);
         }
+    }
+
+    private boolean hasObstacleInPathAttack(int targetRow, int targetColumn, int index) {
+        Set<Pair<Integer, Integer>> shootablePositions = BoardSingleton.getInstance().getShootablePositions(index);
+        return !shootablePositions.contains(new Pair<>(targetRow,targetColumn));
     }
 
     private boolean hasObstacleWalking(int targetRow, int targetColumn, int unitRow, int unitColumn){
@@ -397,7 +412,7 @@ public class BattleController {
         addHistory(player, attacker, defender);
         SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().action(attacker, defender);
         map.get(defender).setProgress(
-                soldier.getSoldier().getHealth() / (soldier.getSoldier().getMAXHEALT() + 0d)
+                soldier.getSoldier().getHealth() / (soldier.getSoldier().getMAXHEALTH() + 0d)
         );
         if (soldier.getSoldier().getHealth() == 0) {
             Pane pane = (Pane) gridPane.getChildren().stream()
@@ -438,13 +453,14 @@ public class BattleController {
     private void editBoardByDoingMovementSet(Integer column, Integer row, int movementradius, String color) {
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
         for (int tempColumn = column - movementradius; tempColumn <= column + movementradius; tempColumn++) {
-            if (tempColumn < 0 || tempColumn > 14) continue;
+            if (tempColumn < 0 || tempColumn >= board[0].length) continue;
             for (int tempRow = row - movementradius; tempRow <= row + movementradius; tempRow++) {
-                if (tempRow < 0 || tempRow > 14) continue;
+                if (tempRow < 0 || tempRow >= board.length) continue;
                 if (board[tempRow][tempColumn] == null) {
                     int finalTempColumn = tempColumn;
                     int finalTempRow = tempRow;
                     if (!hasObstacleWalking(finalTempRow, finalTempColumn, row, column)) {
+                    //if(!hasObstacleInPathAttack(finalTempRow, finalTempColumn, BoardSingleton.getInstance().getSoldier(column, row).getIndex())){
                         Pane pane = (Pane) gridPane.getChildren().stream()
                                 .filter((ent) -> Objects.equals(GridPane.getColumnIndex(ent), finalTempColumn) && Objects.equals(GridPane.getRowIndex(ent), finalTempRow)).findAny().orElseThrow();
                         pane.setStyle("-fx-background-color: %s; -fx-border-color: black".formatted(color));
@@ -458,11 +474,11 @@ public class BattleController {
                                 if (hod && choice != 0) {
                                     SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
                                     editBoardByDoingMovementSet(column, row, movementradius, BOARD_COLOR);
-                                    editBoardByDoingAttackSet(column, row, mySoldierByCoordinates.getSoldier().getDamageRadius(), false);
+                                    editBoardByDoingAttackSet(column, row, false);
                                     move(Player.You, choice, finalTempColumn, finalTempRow);
                                     int result = 0;
                                     if (!SoldierSpeciality.oneDoingByHod(mySoldierByCoordinates.getSoldier())) {
-                                        result = editBoardByDoingAttackSet(mySoldierByCoordinates.getCol(), mySoldierByCoordinates.getRow(), mySoldierByCoordinates.getSoldier().getDamageRadius(), true);
+                                        result = editBoardByDoingAttackSet(mySoldierByCoordinates.getCol(), mySoldierByCoordinates.getRow(), true);
                                     }
                                     if (result == 0) {
 
@@ -600,6 +616,9 @@ public class BattleController {
         }
         if (soldier instanceof HorseKnight) {
             return "Horse knight";
+        }
+        if(soldier instanceof Mortar){
+            return "Mortar";
         }
         return "WTF";
     }

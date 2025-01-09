@@ -1,12 +1,12 @@
 package org.example.GameEntities.soldiers;
 
-public class Archer extends AbstractRadiusAttacker {
+public class Mortar extends AbstractRadiusAreaAttacker{
 
-    public Archer() {
-        super(2,6,5);
-        health=6;
-        damage=3;
-        movementradius=3;
+    public Mortar() {
+        super(5, 10, 10, 3);
+        health=10;
+        damage=5;
+        movementradius=1;
     }
 
     @Override

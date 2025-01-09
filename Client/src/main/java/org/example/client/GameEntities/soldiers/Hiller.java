@@ -1,12 +1,11 @@
 package org.example.client.GameEntities.soldiers;
 
-public class Hiller extends AbstractSoldier{
+public class Hiller extends AbstractRadiusAttacker {
     public Hiller() {
-        super(3,3);
+        super(3,3,2);
         health=3;
         damage=3;
         movementradius=2;
-        damageRadius=2;
     }
 
     @Override

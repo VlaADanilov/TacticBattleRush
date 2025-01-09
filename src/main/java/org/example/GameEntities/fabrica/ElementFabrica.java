@@ -1,6 +1,7 @@
 package org.example.GameEntities.fabrica;
 
-import org.example.GameEntities.AbstractEntity;
+
+
 import org.example.GameEntities.elements.AbstractElement;
 import org.example.GameEntities.elements.Stone;
 import org.example.GameEntities.elements.Tree;
