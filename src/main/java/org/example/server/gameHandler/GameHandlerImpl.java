@@ -26,6 +26,8 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
     private int hod;
     private Map<Integer, AbstractSoldier> soldierMap = new HashMap<>();
     private int cntOfUnits = 3;
+    private final static int BOARD_ROWS = 15;
+    private final static int BOARD_COLS = 15;
 
 
     public GameHandlerImpl(Socket opponentOne, Socket opponentTwo, ServerExample serverExample, int cntOfUnits) {
@@ -34,7 +36,7 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         this.server = serverExample;
         hod = 1;
 
-        Byte[] elementsCoordinats = initBoard();
+        Byte[] elementsCoordinats = initBoard(BOARD_ROWS,BOARD_COLS);
 
         listeners = new ArrayList<>();
         OpponentsCoordinatsListener opponentsCoordinatsListener = new OpponentsCoordinatsListener();

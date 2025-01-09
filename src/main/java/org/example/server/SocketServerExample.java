@@ -93,13 +93,13 @@ public class SocketServerExample implements ServerExample{
         Thread thread = new Thread(() -> {
            try{
                Message message = Message.readMessage(socket.getInputStream());
-               System.out.println(Message.toString(message));
                for(ServerEventListener listener : listeners){
                    if(listener.getType() == message.getType()){
                        listener.handle(socket, message);
                    }
                }
            }catch(Exception e){
+               e.printStackTrace();
                for(Map.Entry<String, List<Map. Entry<Socket, Boolean>>> entry : sockets.entrySet()){
                    for(Map.Entry<Socket, Boolean> socketEntry : entry.getValue()){
                        if(socketEntry.getKey() == socket){
