@@ -11,6 +11,7 @@ import org.example.client.HelloApplication;
 import org.example.client.service.MessageWaitingService;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,8 +71,12 @@ public class RoomController {
         ClientImpl client = ClientImpl.getInstance();
         Byte selectedValue = countOfUnitsComboBox.getValue();
         if(selectedValue == null) selectedValue = 0;
+        ByteBuffer buffer = ByteBuffer.allocate(2 + room_number.getText().getBytes().length);
+        buffer.put((byte) 1);
+        buffer.put(selectedValue);
+        buffer.put(room_number.getText().getBytes());
         try {
-            client.sendMessage(Message.createMessage(Message.TYPE2, new byte[]{1,selectedValue}));
+            client.sendMessage(Message.createMessage(Message.TYPE2, buffer.array()));
         }catch (Exception e){
             throw new RuntimeException(e.getMessage());
         }

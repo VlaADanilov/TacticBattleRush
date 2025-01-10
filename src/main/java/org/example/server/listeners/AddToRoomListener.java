@@ -2,6 +2,7 @@ package org.example.server.listeners;
 
 
 import org.example.protocol.Message;
+import org.example.utils.OnePlayerInRoom;
 
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -30,17 +31,17 @@ public class AddToRoomListener extends AbstractServerListener{
 
 
     private String addToRoom(String roomId, Socket socket){
-        Map<String, List<Map.Entry<Socket, Boolean>>> sockets = server.getSockets();
+        Map<String, List<OnePlayerInRoom>> sockets = server.getSockets();
         if(sockets.get(roomId) == null || sockets.get(roomId).isEmpty()){
-            List<Map.Entry<Socket, Boolean>> socketList = new ArrayList<>();
-            socketList.add(new AbstractMap.SimpleEntry<>(socket, false));
+            List<OnePlayerInRoom> socketList = new ArrayList<>();
+            socketList.add(new OnePlayerInRoom(socket));
             sockets.put(roomId, socketList);
             return roomId + " Ожидание";
         }else{
             if(sockets.get(roomId).size() == 2){
                 return roomId + " Занято";
             }else{
-                sockets.get(roomId).add(new AbstractMap.SimpleEntry<>(socket, false));
+                sockets.get(roomId).add(new OnePlayerInRoom(socket));
                 return roomId + " Присоединился";
             }
         }

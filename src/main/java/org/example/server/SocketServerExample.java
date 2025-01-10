@@ -4,6 +4,7 @@ package org.example.server;
 
 import org.example.protocol.Message;
 import org.example.server.listeners.ServerEventListener;
+import org.example.utils.OnePlayerInRoom;
 import org.w3c.dom.ls.LSOutput;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class SocketServerExample implements ServerExample{
     private int port;
     private ServerSocket serverSocket;
     private boolean started;
-    private Map<String,List<Entry<Socket, Boolean>>> sockets;
+    private final Map<String, List<OnePlayerInRoom>> sockets;
 
     public SocketServerExample(int port) {
         this.listeners = new ArrayList<>();
@@ -56,12 +57,12 @@ public class SocketServerExample implements ServerExample{
         if(!started){
             throw new RuntimeException("Server not started");
         }
-        for(Map.Entry<String, List<Map.Entry<Socket, Boolean>>> entry : sockets.entrySet()){
+        for(Map.Entry<String, List<OnePlayerInRoom>> entry : sockets.entrySet()){
             try{
-                List<Map.Entry<Socket, Boolean>> twoSockets = entry.getValue();
-                for(Map.Entry<Socket, Boolean> entry1 : twoSockets){
-                    entry1.getKey().getOutputStream().write(Message.getBytes(message));
-                    entry1.getKey().getOutputStream().flush();
+                List<OnePlayerInRoom> twoSockets = entry.getValue();
+                for(OnePlayerInRoom player : twoSockets){
+                    player.getSocket().getOutputStream().write(Message.getBytes(message));
+                    player.getSocket().getOutputStream().flush();
                 }
             }catch(IOException e){
                 throw new RuntimeException("Cannot send message", e);
@@ -100,9 +101,9 @@ public class SocketServerExample implements ServerExample{
                }
            }catch(Exception e){
                e.printStackTrace();
-               for(Map.Entry<String, List<Map. Entry<Socket, Boolean>>> entry : sockets.entrySet()){
-                   for(Map.Entry<Socket, Boolean> socketEntry : entry.getValue()){
-                       if(socketEntry.getKey() == socket){
+               for(Map.Entry<String, List<OnePlayerInRoom>> entry : sockets.entrySet()){
+                   for(OnePlayerInRoom socketEntry : entry.getValue()){
+                       if(socketEntry.getSocket() == socket){
                            sockets.get(entry.getKey()).remove(socketEntry);
                            if(sockets.get(entry.getKey()).isEmpty()){
                                sockets.remove(entry.getKey());
@@ -131,7 +132,7 @@ public class SocketServerExample implements ServerExample{
         }
     }
 
-    public Map<String, List<Map.Entry<Socket, Boolean>>> getSockets() {
+    public Map<String, List<OnePlayerInRoom>> getSockets() {
         return sockets;
     }
 }
