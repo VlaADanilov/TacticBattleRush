@@ -107,7 +107,7 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
                     } else {
                         message = Message.readMessage(opponentTwo.getInputStream());
                     }
-                }catch (IOException e){
+                }catch (Exception e){
                     throw new PlayerException(hod);
                 }
                 boolean flag = false;
