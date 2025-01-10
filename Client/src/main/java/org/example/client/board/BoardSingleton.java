@@ -3,6 +3,7 @@ package org.example.client.board;
 import javafx.util.Pair;
 import lombok.val;
 import org.example.client.GameEntities.fabrica.SoldierFabrica;
+import org.example.client.GameEntities.soldiers.AbstractRadiusAreaAttacker;
 import org.example.client.GameEntities.soldiers.AbstractRadiusAttacker;
 import org.example.client.GameEntities.soldiers.AbstractSoldier;
 import org.example.client.GameEntities.AbstractEntity;
@@ -126,25 +127,99 @@ public class BoardSingleton {
         throw new RuntimeException();
     }
 
+    public Set<Pair<Integer,Integer>> getMovementPositions(int index){
+        Set<Pair<Integer,Integer>> movementPositions = new HashSet<>();
+        SoldierWithIndexAndCoordinats soldierByIndex = getSoldierByIndex(index);
+        int playerRow = soldierByIndex.getRow();
+        int playerColumn = soldierByIndex.getCol();
+        int movementRadius = soldierByIndex.getSoldier().getMovementradius();
+
+        for (int row = playerRow - movementRadius; row <= playerRow + movementRadius; row++) {
+            if(row < 0 || row >= board.length) continue;
+            for(int column = playerColumn - movementRadius; column <= playerColumn + movementRadius; column++) {
+                if(column < 0 || column >= board[0].length) continue;
+                if(row == playerRow && column == playerColumn) continue;
+                if(board[row][column] == null && !hasObstacleWalking(row, column, playerRow, playerColumn)){
+                    movementPositions.add(new Pair<>(row, column));
+                }
+            }
+        }
+
+        return movementPositions;
+    }
+
+    private boolean hasObstacleWalking(int targetRow, int targetColumn, int unitRow, int unitColumn){
+        // Если цель совпадает с персонажем, препятствий нет
+        if (targetRow == unitRow && targetColumn == unitColumn) {
+            return false;
+        }
+
+        // Определяем направление
+        int dx = Integer.compare(targetRow, unitRow); // -1 (вверх), 0 (нет по строкам), 1 (вниз)
+        int dy = Integer.compare(targetColumn, unitColumn); // -1 (влево), 0 (нет по столбцам), 1 (вправо)
+
+//         Если цель по прямой, то проверяем все на пути
+        if (dx == 0 || dy == 0){
+            int currentX = unitRow + dx;
+            int currentY = unitColumn + dy;
+
+            // Движемся от персонажа к цели и проверяем каждую клетку на наличие препятствий
+            while (currentX != targetRow || currentY != targetColumn) {
+                if (isObstacle(currentX, currentY)) {
+                    return true; // Если найдено препятствие, то возвращаем true
+                }
+
+                currentX += dx;
+                currentY += dy;
+            }
+            return false;
+        }
+        // Если цель по диагонали, то проверяем только на наличие препятствия непосредственно в клетке перед целью
+        int nextX = targetRow - dx;
+        int nextY = targetColumn - dy;
+
+        if(nextX == unitRow || nextY == unitColumn) {
+            return false;
+        }
+
+        return isObstacle(nextX, nextY);
+    }
+
+
     // Метод, который возвращает список позиций, в которые игрок может выстрелить
     public Set<Pair<Integer, Integer>> getShootablePositions(int index) {
         Set<Pair<Integer, Integer>> shootablePositions = new HashSet<>();
         SoldierWithIndexAndCoordinats soldierByIndex = getSoldierByIndex(index);
         int playerRow = soldierByIndex.getRow();
         int playerColumn = soldierByIndex.getCol();
-        int radius = 0;
+        int damageRadius = 0;
+        int minRadius = 0;
         if(soldierByIndex.getSoldier() instanceof AbstractRadiusAttacker){
-            radius = ((AbstractRadiusAttacker) soldierByIndex.getSoldier()).getDamageRadius();
+            damageRadius = ((AbstractRadiusAttacker) soldierByIndex.getSoldier()).getDamageRadius();
         }
-        for (int row = playerRow - radius; row <= playerRow + radius; row++) {
-            for (int column = playerColumn - radius; column <= playerColumn + radius; column++) {
+        if(soldierByIndex.getSoldier() instanceof AbstractRadiusAreaAttacker){
+            minRadius = ((AbstractRadiusAreaAttacker) soldierByIndex.getSoldier()).getMinDamageRadius();
+        }
+        for (int row = playerRow - damageRadius; row <= playerRow + damageRadius; row++) {
+            for (int column = playerColumn - damageRadius; column <= playerColumn + damageRadius; column++) {
+                if(row > playerRow - minRadius && row < playerRow + minRadius && column > playerColumn - minRadius && column < playerColumn + minRadius){
+                    continue;
+                }
                 // Проверяем, что позиция находится в пределах игрового поля
                 if (row >= 0 && row < board.length && column >= 0 && column < board[0].length) {
                     Pair<Integer, Integer> targetPosition = new Pair<>(row, column);
 
-                    // Проверяем, не блокируется ли путь до цели
-                    if (isPathClear(soldierByIndex.getRow(), soldierByIndex.getCol(), row, column)) {
-                        shootablePositions.add(targetPosition);
+                    //так как только мортира AbstractRadiusAreaAttacker
+                    if(minRadius != 0){
+                        if(!isObstacle(row, column)){
+                            shootablePositions.add(targetPosition);
+                            continue;
+                        }
+                    }else {
+                        // Проверяем, не блокируется ли путь до цели
+                        if (isPathClear(soldierByIndex.getRow(), soldierByIndex.getCol(), row, column)) {
+                            shootablePositions.add(targetPosition);
+                        }
                     }
                 }
             }
@@ -188,6 +263,17 @@ public class BoardSingleton {
         return true; // путь свободен
     }
 
+    private boolean isObstacle(int row, int column) {
+        if (row >= 0 && row < board.length && column >= 0 && column < board[0].length) {
+            if (board[row][column] == null) {
+                return false;
+            } else {
+                AbstractEntity ent = board[row][column];
+                return ent instanceof AbstractElement;
+            }
+        }
+        return true; // Если координаты выходят за границы поля - считаем это препятствием
+    }
 
     public SoldierWithIndexAndCoordinats getSoldierByIndex(int index){
         SoldierWithIndexAndCoordinats soldier = null;

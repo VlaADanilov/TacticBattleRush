@@ -11,5 +11,8 @@ public class Hiller extends AbstractRadiusAttacker {
     @Override
     public void action(AbstractSoldier soldier) {
         soldier.setHealth(soldier.getHealth()+damage);
+        if(soldier.getHealth() == soldier.getMAXHEALTH()){
+            soldier.setHealth(soldier.getMAXHEALTH());
+        }
     }
 }
