@@ -1,10 +1,11 @@
 package org.example.server.gameHandler.listeners;
 
 import org.example.protocol.Message;
+import org.example.server.gameHandler.exception.PlayerException;
 
 public class UserActionMoveListener extends AbstractGameListener{
     @Override
-    public void handle(int i, Message message) {
+    public void handle(int i, Message message) throws PlayerException {
         if(message.getData().length == 3) {
             try {
                 if (i == 1) {
@@ -14,11 +15,11 @@ public class UserActionMoveListener extends AbstractGameListener{
                     Message.readMessage(opponentOne.getInputStream());
                     server.sendMessage(opponentOne, message);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch(Exception e){
+                throw new PlayerException(i == 1? 2 : 1);
             }
         }else{
-            throw new RuntimeException("WTF?!");
+            throw new PlayerException(i);
         }
     }
 

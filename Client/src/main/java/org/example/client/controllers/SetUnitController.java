@@ -175,10 +175,26 @@ public class SetUnitController {
         service = new MyService();
 
         service.setOnSucceeded((event) -> {
-            try {
-                HelloApplication.changeScene("battle.fxml");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if(ClientImpl.getInstance().getLastMessage().getType() == Message.TYPE5){
+                if(ClientImpl.getInstance().getLastMessage().getData()[0] == 1){
+                    System.out.println("Ты победил, у соперника проблемы...");
+                    try {
+                        HelloApplication.changeScene("main_menu.fxml");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                else{
+                    System.out.println("WTF?");
+                    throw new RuntimeException();
+                }
+            }
+            else {
+                try {
+                    HelloApplication.changeScene("battle.fxml");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -195,12 +211,12 @@ public class SetUnitController {
 
         @Override
         protected Task<Boolean> createTask() {
-            return new Task<Boolean>() {
+            return new Task<>() {
 
                 @Override
                 protected Boolean call() throws Exception {
                     Message message = ClientImpl.getInstance().getMessage();
-                    if(message.getType() == 3){
+                    if(message.getType() == Message.TYPE3 || message.getType() == Message.TYPE5){
                         return true;
                     }else{
                         throw new RuntimeException();

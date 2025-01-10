@@ -6,6 +6,7 @@ import org.example.GameEntities.soldiers.AbstractSoldier;
 import org.example.protocol.Message;
 import org.example.protocol.exception.ExceedingTheMaximumLengthException;
 import org.example.protocol.exception.WrongMessageTypeException;
+import org.example.server.gameHandler.exception.PlayerException;
 
 import java.util.*;
 
@@ -16,7 +17,7 @@ public class OpponentsCoordinatsListener extends AbstractGameListener{
     private int cntOfUnits = 6;
 
     @Override
-    public void handle(int i, Message message) {
+    public void handle(int i, Message message) throws PlayerException {
         if(map.size() < cntOfUnits) {
             byte[] arr = message.getData();
             for (int j = 2; j < arr.length; j += 3) {
@@ -40,10 +41,8 @@ public class OpponentsCoordinatsListener extends AbstractGameListener{
                 }
                 try {
                     server.sendMessage(opponentOne, Message.createMessage(Message.TYPE3, array));
-                } catch (ExceedingTheMaximumLengthException e) {
-                    throw new RuntimeException(e);
-                } catch (WrongMessageTypeException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    throw new PlayerException(1);
                 }
             }
             else{
@@ -59,10 +58,8 @@ public class OpponentsCoordinatsListener extends AbstractGameListener{
                 }
                 try {
                     server.sendMessage(opponentTwo, Message.createMessage(Message.TYPE3, array));
-                } catch (ExceedingTheMaximumLengthException e) {
-                    throw new RuntimeException(e);
-                } catch (WrongMessageTypeException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    throw new PlayerException(2);
                 }
             }
 

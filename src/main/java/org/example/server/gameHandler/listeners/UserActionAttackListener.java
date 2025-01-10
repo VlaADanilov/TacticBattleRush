@@ -1,31 +1,50 @@
 package org.example.server.gameHandler.listeners;
 
+import org.example.GameEntities.soldiers.AbstractSoldier;
 import org.example.protocol.Message;
+import org.example.server.gameHandler.exception.PlayerException;
+
+import java.util.Map;
 
 public class UserActionAttackListener extends AbstractGameListener{
     @Override
-    public void handle(int i, Message message) {
+    public void handle(int i, Message message) throws PlayerException {
         if(message.getData().length == 2){
             int index1 = message.getData()[0];
             int index2 = message.getData()[1];
             action(index1, index2);
         }
-        try{
-            if(i == 1){
-                Message.readMessage(opponentTwo.getInputStream());
-                server.sendMessage(opponentTwo, message);
-            }else{
-                Message.readMessage(opponentOne.getInputStream());
-                server.sendMessage(opponentOne, message);
+        if(isContinue()) {
+            try {
+                if (i == 1) {
+                    Message.readMessage(opponentTwo.getInputStream());
+                    server.sendMessage(opponentTwo, message);
+                } else {
+                    Message.readMessage(opponentOne.getInputStream());
+                    server.sendMessage(opponentOne, message);
+                }
+            } catch (Exception e) {
+                throw new PlayerException(i == 1 ? 2 : 1);
             }
-        }catch(Exception e){
-            throw new RuntimeException(e);
         }
     }
 
     private void action(int index1, int index2){
         soldierMap.get(index1).action(soldierMap.get(index2));
         if(soldierMap.get(index2).getHealth() < 0) soldierMap.get(index2).setHealth(0);
+    }
+
+    private boolean isContinue(){
+        int health = 0;
+        for(int i = 1; i <= soldierMap.size() / 2; i++){
+            health += soldierMap.get(i).getHealth();
+        }
+        if(health <= 0) return false;
+        health = 0;
+        for(int i = soldierMap.size() / 2 + 1; i <= soldierMap.size() ; i++){
+            health += soldierMap.get(i).getHealth();
+        }
+        return !(health <= 0);
     }
 
     @Override

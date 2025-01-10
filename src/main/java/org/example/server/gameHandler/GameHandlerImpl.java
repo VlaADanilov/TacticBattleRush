@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.example.GameEntities.soldiers.AbstractSoldier;
 import org.example.protocol.Message;
 import org.example.server.ServerExample;
+import org.example.server.gameHandler.exception.PlayerException;
 import org.example.server.gameHandler.listeners.*;
 
 import java.io.IOException;
@@ -59,10 +60,14 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         userActionMoveAndAttackListenerListener.init(server, this.opponentOne, this.opponentTwo, this.soldierMap);
         listeners.add(userActionMoveAndAttackListenerListener);
 
-        sendStartMessage(elementsCoordinats);
+        try {
+            sendStartMessage(elementsCoordinats);
+        }catch (PlayerException e){
+            catchingException(e.getPlayer());
+        }
     }
 
-    private void sendStartMessage(Byte[] bytes) {
+    private void sendStartMessage(Byte[] bytes) throws PlayerException {
         ByteBuffer buffer1 = ByteBuffer.allocate(bytes.length + 2);
         ByteBuffer buffer2 = ByteBuffer.allocate(bytes.length + 2);
         buffer1.put(Byte.parseByte("1"));
@@ -75,35 +80,51 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         }
         try {
             server.sendMessage(opponentOne, Message.createMessage(Message.TYPE2, buffer1.array()));
+        }catch (Exception e){
+            throw new PlayerException(1);
+        }
+        try{
             server.sendMessage(opponentTwo, Message.createMessage(Message.TYPE2, buffer2.array()));
         }catch (Exception e){
-            throw new RuntimeException(e);
+            throw new PlayerException(2);
         }
-
     }
 
     @Override
     public void run() {
-        readAndSendCoordinatesMessages();
+        try {
+            readAndSendCoordinatesMessages();
+        }catch (PlayerException e){
+            catchingException(e.getPlayer());
+        }
         int winner = 0;
         while(winner == 0){
             try {
                 Message message;
-                if(hod == 1){
-                    message = Message.readMessage(opponentOne.getInputStream());
-                }else{
-                    message = Message.readMessage(opponentTwo.getInputStream());
+                try {
+                    if (hod == 1) {
+                        message = Message.readMessage(opponentOne.getInputStream());
+                    } else {
+                        message = Message.readMessage(opponentTwo.getInputStream());
+                    }
+                }catch (IOException e){
+                    throw new PlayerException(hod);
                 }
+                boolean flag = false;
                 for(AbstractGameListener listener : listeners){
                     if(listener.getType() == message.getType()){
                         listener.handle(hod, message);
+                        flag = true;
                         break;
                     }
                 }
+                if(!flag){
+                    throw new PlayerException(hod);
+                }
                 hod = hod == 1? 2 : 1;
                 winner = whoWinner();
-            }catch (Exception e){
-                throw new RuntimeException(e);
+            }catch (PlayerException e){
+                catchingException(e.getPlayer());
             }
         }
         try {
@@ -119,22 +140,26 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         }
     }
 
-    private void readAndSendCoordinatesMessages(){
+    private void readAndSendCoordinatesMessages() throws PlayerException {
+        Message messageOne, messageTwo;
         try {
-            Message messageOne = Message.readMessage(opponentOne.getInputStream());
-            Message messageTwo = Message.readMessage(opponentTwo.getInputStream());
-            for(AbstractGameListener listener : listeners){
-                if(listener.getType() == messageOne.getType() && listener.getType() == messageTwo.getType()){
-                    listener.handle(1, messageOne);
-                    listener.handle(2, messageTwo);
-                    listener.handle(1, messageOne);
-                    listener.handle(2, messageTwo);
-                    break;
-                }
+            messageOne = Message.readMessage(opponentOne.getInputStream());
+        }catch (Exception e){
+            throw new PlayerException(1);
+        }
+        try {
+            messageTwo = Message.readMessage(opponentTwo.getInputStream());
+        }catch (Exception e){
+            throw new PlayerException(2);
+        }
+        for(AbstractGameListener listener : listeners){
+            if(listener.getType() == messageOne.getType() && listener.getType() == messageTwo.getType()){
+                listener.handle(1, messageOne);
+                listener.handle(2, messageTwo);
+                listener.handle(1, messageOne);
+                listener.handle(2, messageTwo);
+                break;
             }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -151,5 +176,17 @@ public class GameHandlerImpl extends AbstractGameHandler implements Runnable{
         if(summaHealth == 0) return 1;
 
         return 0;
+    }
+
+    private void catchingException(int i){
+        try {
+            if (i == 1) {
+                server.sendMessage(opponentTwo, Message.createMessage(Message.TYPE5, new byte[]{1}));
+            } else {
+                server.sendMessage(opponentOne, Message.createMessage(Message.TYPE5, new byte[]{1}));
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }

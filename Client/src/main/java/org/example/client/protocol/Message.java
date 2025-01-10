@@ -101,7 +101,7 @@ public class Message {
         return sb.toString();
     }
 
-    public synchronized static Message readMessage(InputStream in){
+    public static Message readMessage(InputStream in){
         byte[] buffer = new byte[MAX_LENGTH];// Not the most optimized approach
         try{
             synchronized (in) {

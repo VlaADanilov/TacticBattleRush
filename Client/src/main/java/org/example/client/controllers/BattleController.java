@@ -427,23 +427,6 @@ public class BattleController {
                         }
                     }
                 }
-
-                boolean flag = false;
-                for (int i = 1; i <= map.size(); i++) {
-                    if (BoardSingleton.getInstance().isMySoldier(i)) {
-                        flag = flag || map.get(i).getProgress() != 0;
-                    }
-                }
-                if (!flag) {
-                    System.out.println("Ты проиграл");
-                    BoardSingleton.getInstance().clear();
-                    ClientImpl.getInstance().disconnect();
-                    try {
-                        HelloApplication.changeScene("hello-view.fxml");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
                 hod = true;
                 hodLabel.setText("You are going");
                 editBoardByDoingMovement();
