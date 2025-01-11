@@ -1,14 +1,12 @@
 package org.example.client.board;
 
 import javafx.util.Pair;
-import lombok.val;
 import org.example.client.GameEntities.fabrica.SoldierFabrica;
 import org.example.client.GameEntities.soldiers.AbstractRadiusAreaAttacker;
 import org.example.client.GameEntities.soldiers.AbstractRadiusAttacker;
 import org.example.client.GameEntities.soldiers.AbstractSoldier;
 import org.example.client.GameEntities.AbstractEntity;
 import org.example.client.GameEntities.elements.AbstractElement;
-import org.example.client.GameEntities.soldiers.Hiller;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 
 import java.util.*;
@@ -17,7 +15,7 @@ import java.util.stream.Collectors;
 
 
 public class BoardSingleton {
-    private AbstractEntity[][] board;
+    private final AbstractEntity[][] board;
     private List<SoldierWithIndexAndCoordinats> mySoldiers;
     private List<SoldierWithIndexAndCoordinats> opponentSoldiers;
 
