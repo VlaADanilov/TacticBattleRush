@@ -1,13 +1,12 @@
 package org.example.client.board;
 
 import javafx.util.Pair;
-import org.example.client.GameEntities.fabrica.SoldierFabrica;
-import org.example.client.GameEntities.soldiers.AbstractRadiusAreaAttacker;
-import org.example.client.GameEntities.soldiers.AbstractRadiusAttacker;
-import org.example.client.GameEntities.soldiers.AbstractSoldier;
-import org.example.client.GameEntities.AbstractEntity;
-import org.example.client.GameEntities.elements.AbstractElement;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
+import ru.itis.prot.gameEntities.AbstractEntity;
+import ru.itis.prot.gameEntities.soldiers.*;
+import ru.itis.prot.gameEntities.fabrica.*;
+import ru.itis.prot.gameEntities.elements.*;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -229,7 +228,9 @@ public class BoardSingleton {
     // Метод, который определяет, не блокирует ли путь до цели препятствие
     private boolean isPathClear(int unitRow, int unitColumn, int targetRow, int targetColumn) {
         // Идем по линии от стартовой точки к цели.
-
+        if(unitRow == targetRow && unitColumn == targetColumn){
+            return false;
+        }
 
 
         int dx = Math.abs(targetRow - unitRow);

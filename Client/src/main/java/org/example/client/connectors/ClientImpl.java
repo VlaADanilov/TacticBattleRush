@@ -1,7 +1,9 @@
 package org.example.client.connectors;
 
 
-import org.example.client.protocol.Message;
+
+
+import ru.itis.prot.protocol.Message;
 
 import java.io.IOException;
 import java.net.InetAddress;

@@ -1,6 +1,7 @@
 package org.example.client.util;
 
-import org.example.client.GameEntities.soldiers.*;
+
+import ru.itis.prot.gameEntities.soldiers.*;
 
 import java.util.ArrayList;
 import java.util.List;

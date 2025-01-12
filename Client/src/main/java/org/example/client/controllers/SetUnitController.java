@@ -4,24 +4,20 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import org.example.client.GameEntities.AbstractEntity;
-import org.example.client.GameEntities.elements.AbstractElement;
-import org.example.client.GameEntities.fabrica.ElementFabrica;
-import org.example.client.GameEntities.fabrica.SoldierFabrica;
+import ru.itis.prot.gameEntities.fabrica.*;
+import ru.itis.prot.gameEntities.elements.*;
+import ru.itis.prot.protocol.Message;
+import ru.itis.prot.protocol.exception.*;
 import org.example.client.HelloApplication;
 import org.example.client.board.BoardSingleton;
 import org.example.client.connectors.ClientImpl;
-import org.example.client.protocol.Message;
-import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
-import org.example.client.protocol.exception.WrongMessageTypeException;
+
 import org.example.client.util.Images;
 
 

@@ -2,7 +2,8 @@ package org.example.client.board.tools;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.client.GameEntities.soldiers.AbstractSoldier;
+import ru.itis.prot.gameEntities.soldiers.AbstractSoldier;
+
 
 @Getter
 @Setter
