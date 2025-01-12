@@ -3,7 +3,7 @@ package ru.itis.prot.gameEntities.soldiers;
 public class Mortar extends AbstractRadiusAreaAttacker {
 
     public Mortar() {
-        super(5, 10, 10, 3);
+        super(5, 10, 7, 3);
         health=10;
         damage=5;
         movementradius=1;

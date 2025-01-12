@@ -199,7 +199,7 @@ public class BoardSingleton {
         }
         for (int row = playerRow - damageRadius; row <= playerRow + damageRadius; row++) {
             for (int column = playerColumn - damageRadius; column <= playerColumn + damageRadius; column++) {
-                if(row > playerRow - minRadius && row < playerRow + minRadius && column > playerColumn - minRadius && column < playerColumn + minRadius){
+                if(row >= playerRow - minRadius && row <= playerRow + minRadius && column >= playerColumn - minRadius && column <= playerColumn + minRadius){
                     continue;
                 }
                 // Проверяем, что позиция находится в пределах игрового поля
