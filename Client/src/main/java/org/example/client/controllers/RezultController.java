@@ -13,14 +13,13 @@ import java.io.IOException;
 public class RezultController {
     @FXML
     private ImageView rezultImage;
-    @FXML
-    private Button exitButton;
+
 
     public void initialize() {
         rezultImage.setImage(Images.getRezultImage(WhoWinner.getWinner()));
     }
 
-    public void exit(MouseEvent actionEvent) {
+    public void exit() {
         try {
             HelloApplication.changeScene("hello-view.fxml");
         } catch (IOException e) {
