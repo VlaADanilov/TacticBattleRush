@@ -1,4 +1,4 @@
-package org.example.client.util;
+package ru.itis.prot.gameEntities;
 
 
 import ru.itis.prot.gameEntities.soldiers.*;

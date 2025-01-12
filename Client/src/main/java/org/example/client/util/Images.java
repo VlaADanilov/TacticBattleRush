@@ -22,4 +22,8 @@ public class Images {
             default -> throw new IllegalStateException("Unexpected value: " + i);
         };
     }
+
+    public synchronized static Image getGrassImage(){
+        return new Image(Images.class.getResourceAsStream("/image/трава.png"));
+    }
 }
