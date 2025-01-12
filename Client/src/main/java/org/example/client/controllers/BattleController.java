@@ -18,6 +18,7 @@ import org.example.client.connectors.ClientImpl;
 import org.example.client.util.Images;
 import org.example.client.util.MyStyle;
 import org.example.client.util.Player;
+import org.example.client.util.WhoWinner;
 import ru.itis.prot.gameEntities.SoldierSpeciality;
 import ru.itis.prot.gameEntities.AbstractEntity;
 import ru.itis.prot.gameEntities.soldiers.*;
@@ -474,14 +475,14 @@ public class BattleController {
             } else {
                 //TODO нужна нормальная логика
                 if (message.getData()[0] == 1) {
-                    System.out.println("Ты выиграл");
+                    WhoWinner.setWinner(1);
                 } else {
-                    System.out.println("Ты проиграл");
+                    WhoWinner.setWinner(0);
                 }
                 BoardSingleton.getInstance().clear();
                 ClientImpl.getInstance().disconnect();
                 try {
-                    HelloApplication.changeScene("hello-view.fxml");
+                    HelloApplication.changeScene("rezult.fxml");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

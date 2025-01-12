@@ -26,4 +26,12 @@ public class Images {
     public synchronized static Image getGrassImage(){
         return new Image(Images.class.getResourceAsStream("/image/трава.png"));
     }
+
+    public synchronized static Image getRezultImage(int i){
+        return switch (i){
+            case 1 -> new Image(Images.class.getResourceAsStream("/image/winner.png"));
+            case 0 -> new Image(Images.class.getResourceAsStream("/image/loser.png"));
+            default -> throw new IllegalStateException("Unexpected value: " + i);
+        };
+    }
 }
