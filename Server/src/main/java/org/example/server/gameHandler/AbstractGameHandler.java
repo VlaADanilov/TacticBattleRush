@@ -131,7 +131,7 @@ public abstract class AbstractGameHandler implements GameHandlerInterface{
         for (int row = minRow + 1; row < maxRow; row++) {
             for (int col = minCol + 1; col < maxCol; col++) {
                 if (!contour.contains(new AbstractMap.SimpleEntry<>(row, col))) {
-                    if (field[row][col].equals(1)) {
+                    if (Objects.equals(field[row][col],1)) {
                         return true; // Найдено свободное место
                     }
                 }

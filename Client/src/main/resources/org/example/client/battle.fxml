@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.Button?>
 <BorderPane styleClass="main-menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.BattleController">
    <top>
       <Label text="Tactic Battle Rush" BorderPane.alignment="CENTER">
@@ -78,6 +79,7 @@
             <Insets left="20.0" />
          </BorderPane.margin>
          <children>
+             <Button maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" onAction="#aboutUnits" prefHeight="25.0" prefWidth="25.0" text="?" />
             <VBox fx:id="healthBox" prefWidth="100.0" />
             <Label fx:id="hodLabel">
                <font>

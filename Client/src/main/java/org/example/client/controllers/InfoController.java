@@ -25,11 +25,16 @@ public class InfoController {
             HBox hBox = new HBox();
             hBox.setSpacing(10);
             ImageView imageView = new ImageView();
-            imageView.setFitWidth(70);
-            imageView.setFitHeight(70);
+            imageView.setFitWidth(80);
+            imageView.setFitHeight(80);
             imageView.setImage(Images.getSoldierImage(abstractSoldier.getINDEX()));
             hBox.getChildren().add(imageView);
             VBox vBox = new VBox();
+
+            Text text = new Text(SoldierSpeciality.nameSoldier(abstractSoldier));
+            text.setStyle("-fx-font-weight: bold; -fx-font-size: 15px;");
+            vBox.getChildren().add(text);
+
             vBox.getChildren().add(new Text("Health = " + abstractSoldier.getHealth()));
             if(!(abstractSoldier instanceof Hiller)){
                 vBox.getChildren().add(new Text("Damage = " + abstractSoldier.getDamage()));

@@ -34,4 +34,23 @@ public class SoldierSpeciality {
         }
         return soldiers;
     }
+
+    public static String nameSoldier(AbstractSoldier soldier){
+        if (soldier instanceof HeavyKnight) {
+            return "Heavy knight";
+        }
+        if (soldier instanceof Archer) {
+            return "Archer";
+        }
+        if (soldier instanceof Hiller) {
+            return "Hiller";
+        }
+        if (soldier instanceof HorseKnight) {
+            return "Horse knight";
+        }
+        if(soldier instanceof Mortar){
+            return "Mortar";
+        }
+        return "WTF";
+    }
 }

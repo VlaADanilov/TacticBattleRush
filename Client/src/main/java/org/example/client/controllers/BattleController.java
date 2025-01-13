@@ -1,17 +1,24 @@
 package org.example.client.controllers;
 
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.example.client.HelloApplication;
+import org.example.client.InfoApplication;
 import org.example.client.board.BoardSingleton;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 import org.example.client.connectors.ClientImpl;
@@ -143,7 +150,7 @@ public class BattleController {
             map.put(soldier.getIndex(), progressBar);
             Label label = new Label(soldier.getIndex() + " " + nameSoldier(soldier.getSoldier()));
             MyStyle style = new MyStyle();
-            label.setOnMouseClicked((event -> {
+            EventHandler<MouseEvent> click = event -> {
                 if (hod) {
                     if (BoardSingleton.getInstance().isMySoldier(soldier.getIndex())) {
                         if (choice == 0) {
@@ -167,23 +174,31 @@ public class BattleController {
                         }
                     }
                 }
-            }));
-            label.setOnMouseEntered((event -> {
+            };
+            label.setOnMouseClicked(click);
+            progressBar.setOnMouseClicked(click);
+            EventHandler<MouseEvent> mouseEntered = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), true, style);
                 }
                 if (BoardSingleton.getInstance().isMySoldier(soldier.getIndex())) {
                     editBoardByChoicingMy(soldier.getCol(), soldier.getRow(), true, style);
                 }
-            }));
-            label.setOnMouseExited((event -> {
+            };
+
+            label.setOnMouseEntered(mouseEntered);
+            progressBar.setOnMouseEntered(mouseEntered);
+            EventHandler<MouseEvent> mouseExited = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), false, style);
                 }
                 if (BoardSingleton.getInstance().isMySoldier(soldier.getIndex())) {
                     editBoardByChoicingMy(soldier.getCol(), soldier.getRow(), false, style);
                 }
-            }));
+            };
+
+            label.setOnMouseExited(mouseExited);
+            progressBar.setOnMouseExited(mouseExited);
             healthBox.getChildren().add(label);
             healthBox.getChildren().add(progressBar);
         }
@@ -517,22 +532,17 @@ public class BattleController {
     }
 
     private String nameSoldier(AbstractSoldier soldier) {
-        if (soldier instanceof HeavyKnight) {
-            return "Heavy knight";
-        }
-        if (soldier instanceof Archer) {
-            return "Archer";
-        }
-        if (soldier instanceof Hiller) {
-            return "Hiller";
-        }
-        if (soldier instanceof HorseKnight) {
-            return "Horse knight";
-        }
-        if(soldier instanceof Mortar){
-            return "Mortar";
-        }
-        return "WTF";
+        return SoldierSpeciality.nameSoldier(soldier);
+    }
+
+    public void aboutUnits(ActionEvent actionEvent) {
+        Platform.runLater(() -> {
+            try {
+                new InfoApplication().start(new Stage());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static class MyService extends Service<Boolean> {

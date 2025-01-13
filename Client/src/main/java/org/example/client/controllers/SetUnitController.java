@@ -1,5 +1,6 @@
 package org.example.client.controllers;
 
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -10,6 +11,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import org.example.client.InfoApplication;
 import ru.itis.prot.gameEntities.fabrica.*;
 import ru.itis.prot.gameEntities.elements.*;
 import ru.itis.prot.protocol.Message;
@@ -201,6 +204,16 @@ public class SetUnitController {
         allOpacity(0.5d);
         choice = 5;
         mortarImage.setOpacity(1);
+    }
+
+    public void aboutUnits(ActionEvent actionEvent) {
+        Platform.runLater(() -> {
+            try {
+                new InfoApplication().start(new Stage());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static class MyService extends Service<Boolean> {
