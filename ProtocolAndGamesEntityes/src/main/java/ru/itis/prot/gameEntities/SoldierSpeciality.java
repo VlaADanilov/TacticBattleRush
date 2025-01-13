@@ -1,6 +1,7 @@
 package ru.itis.prot.gameEntities;
 
 
+import ru.itis.prot.gameEntities.fabrica.SoldierFabrica;
 import ru.itis.prot.gameEntities.soldiers.*;
 
 import java.util.ArrayList;
@@ -24,5 +25,13 @@ public class SoldierSpeciality {
     public static boolean oneDoingByHod(AbstractSoldier soldier){
 
         return soldier.getClass().equals(Archer.class) || soldier.getClass().equals(Mortar.class);
+    }
+
+    public static List<AbstractSoldier> allSoldiers(){
+        List<AbstractSoldier> soldiers = new ArrayList<>();
+        for(int i = 1; i <= 5; i++){
+            soldiers.add(SoldierFabrica.getSoldier(i));
+        }
+        return soldiers;
     }
 }
