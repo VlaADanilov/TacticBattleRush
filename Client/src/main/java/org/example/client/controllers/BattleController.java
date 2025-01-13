@@ -52,12 +52,11 @@ public class BattleController {
     private byte[] array;
     private static final String BOARD_COLOR = "#38FF25FF";
 
-    private double imagesWidth;
-    private double imagesHeight;
-
     public void initialize() {
-        imagesWidth = gridPane.getMaxWidth() / gridPane.getColumnCount();
-        imagesHeight = gridPane.getMaxHeight() / gridPane.getColumnCount();
+
+        GridPane.setHgrow(gridPane, Priority.ALWAYS);
+        GridPane.setVgrow(gridPane, Priority.ALWAYS);
+
         myService = getMyService();
         hod = BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getLastMessage().getData()) == 1;
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
@@ -71,12 +70,8 @@ public class BattleController {
                         BackgroundRepeat.NO_REPEAT,
                         BackgroundPosition.CENTER,
                         new BackgroundSize(
-                                imagesWidth,
-                                imagesHeight,
-                                false,
-                                false,
-                                true,
-                                true
+                                0,0,
+                                true,true,true,true
                         )
                         )));
                 pane.setStyle("-fx-border-color: black");
@@ -90,8 +85,13 @@ public class BattleController {
                         );
 
 
-                        imageView.setFitHeight(imagesHeight);
-                        imageView.setFitWidth(imagesWidth);
+                        imageView.setPreserveRatio(false); // Сохранять пропорции
+                        imageView.setSmooth(true);  // Сглаживание изображения
+                        imageView.setCache(true); // Кэширование изображения
+
+                        imageView.fitWidthProperty().bind(pane.widthProperty());
+                        imageView.fitHeightProperty().bind(pane.heightProperty());
+
                         pane.getChildren().add(imageView);
                         gridPane.add(pane, y, x);
                     } else {
@@ -107,8 +107,12 @@ public class BattleController {
                                 pane.setStyle("-fx-background-color: red");
                             }
 
-                            imageView.setFitHeight(imagesHeight);
-                            imageView.setFitWidth(imagesWidth);
+                            imageView.setPreserveRatio(false); // Сохранять пропорции
+                            imageView.setSmooth(true);  // Сглаживание изображения
+                            imageView.setCache(true); // Кэширование изображения
+
+                            imageView.fitWidthProperty().bind(pane.widthProperty());
+                            imageView.fitHeightProperty().bind(pane.heightProperty());
                             pane.getChildren().add(imageView);
                             gridPane.add(pane, y, x);
                         }
@@ -350,12 +354,8 @@ public class BattleController {
                     BackgroundRepeat.NO_REPEAT,
                     BackgroundPosition.CENTER,
                     new BackgroundSize(
-                            imagesWidth,
-                            imagesHeight,
-                            false,
-                            false,
-                            true,
-                            true
+                            0,0,
+                            true,true,true,true
                     )
             )));
             newPane.setStyle("-fx-border-color: black");
@@ -401,12 +401,8 @@ public class BattleController {
                         BackgroundRepeat.NO_REPEAT,
                         BackgroundPosition.CENTER,
                         new BackgroundSize(
-                                imagesWidth,
-                                imagesHeight,
-                                false,
-                                false,
-                                true,
-                                true
+                                0,0,
+                                true,true,true,true
                         )
                 )));
                 pane.setStyle("-fx-border-color: black");
