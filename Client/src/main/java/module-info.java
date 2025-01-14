@@ -7,6 +7,8 @@ module ru.client {
     requires static lombok;
     requires java.xml;
     requires ru.itis.prot;
+    requires java.desktop;
+    requires javafx.media;
 
     opens org.example.client to javafx.fxml;
     exports org.example.client;
@@ -14,4 +16,5 @@ module ru.client {
     opens org.example.client.connectors to javafx.fxml;
     exports org.example.client.controllers;
     opens org.example.client.controllers to javafx.fxml;
+    exports org.example.client.animaitedPanes to javafx.fxml;
 }

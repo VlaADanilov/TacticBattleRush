@@ -8,10 +8,13 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import org.example.client.animaitedPanes.BellAnimPane?>
 <BorderPane styleClass="main-menu" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.BattleController">
    <top>
       <Label text="Tactic Battle Rush" BorderPane.alignment="CENTER">
@@ -84,19 +87,21 @@
          </BorderPane.margin>
          <children>
              <Button maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" onAction="#aboutUnits" prefHeight="25.0" prefWidth="25.0" text="?" />
-            <ScrollPane fx:id="scrollable" styleClass="scroll-pane" maxHeight="400.0" prefWidth="250.0" minWidth="250">
+            <ScrollPane fx:id="scrollable" maxHeight="400.0" minWidth="250" prefWidth="250.0" styleClass="scroll-pane">
                <content>
                   <VBox fx:id="healthBox" alignment="TOP_CENTER" prefWidth="100.0" />
                </content>
             </ScrollPane>
-            <Label fx:id="hodLabel">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Label>
+            <HBox spacing="30.0">
+               <children>
+                  <BellAnimPane fx:id="bell" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" prefHeight="30.0" prefWidth="30.0" />
+                  <Label fx:id="hodLabel">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
             <TextArea fx:id="historyTextArea" editable="false" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" wrapText="true" />
          </children>
       </VBox>

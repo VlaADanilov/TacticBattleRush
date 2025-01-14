@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.example.client.HelloApplication;
 import org.example.client.InfoApplication;
+import org.example.client.animaitedPanes.BellAnimPane;
 import org.example.client.board.BoardSingleton;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 import org.example.client.connectors.ClientImpl;
@@ -39,6 +40,8 @@ import java.util.*;
 
 public class BattleController {
     @FXML
+    private BellAnimPane bell;
+    @FXML
     private ScrollPane scrollable;
     @FXML
     private TextArea historyTextArea;
@@ -56,7 +59,6 @@ public class BattleController {
     private static final String BOARD_COLOR = "#38FF25FF";
 
     public void initialize() {
-
         GridPane.setHgrow(gridPane, Priority.ALWAYS);
         GridPane.setVgrow(gridPane, Priority.ALWAYS);
 
@@ -538,6 +540,7 @@ public class BattleController {
                         }
                     }
                 }
+                bell.startAnim();
                 hod = true;
                 hodLabel.setText("You are going");
                 editBoardByDoingMovement();
