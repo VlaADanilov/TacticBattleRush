@@ -78,7 +78,6 @@ public class BattleController {
                         )
                         )));
                 pane.setStyle("-fx-border-color: black");
-                //pane.setStyle("-fx-background-color: %s;-fx-border-color: black;".formatted(BOARD_COLOR));
                 if (entity == null) {
                     gridPane.add(pane, y, x);
                 } else {
@@ -103,7 +102,6 @@ public class BattleController {
                                     Images.getSoldierImage(((AbstractSoldier) entity).getINDEX())
                             );
 
-
                             if (BoardSingleton.getInstance().isMySoldier(soldier)) {
                                 pane.setStyle("-fx-background-color: blue");
                             } else {
@@ -117,6 +115,14 @@ public class BattleController {
                             imageView.fitWidthProperty().bind(pane.widthProperty());
                             imageView.fitHeightProperty().bind(pane.heightProperty());
                             pane.getChildren().add(imageView);
+
+                            SoldierWithIndexAndCoordinats sold = BoardSingleton.getInstance().getSoldier(y, x);
+                            Label label = new Label(String.valueOf(sold.getIndex()));
+                            label.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+                            pane.getChildren().add(label);
+                            if(SoldierSpeciality.indexInRight(soldier)){
+                                bindLabelToRightTop(label, pane);
+                            }
                             gridPane.add(pane, y, x);
                         }
                     }
@@ -142,36 +148,65 @@ public class BattleController {
         }
     }
 
+    private void bindLabelToRightTop(Label label, Pane pane){
+        // Привязка координаты X к правой границе Pane
+        label.layoutXProperty().bind(pane.widthProperty().subtract(label.widthProperty()));
+
+        // Привязка координаты Y к верхней границе Pane (0)
+        label.layoutYProperty().set(0);
+    }
+
     private void addHealthBars(List<SoldierWithIndexAndCoordinats> soldiers) {
         healthBox.setStyle("-fx-background-color: transparent");
         for (SoldierWithIndexAndCoordinats soldier : soldiers) {
             HBox hBox = new HBox();
             hBox.setSpacing(10);
+            Pane pane = new Pane();
+            pane.setMinWidth(50);
+            pane.setMinHeight(50);
+            pane.setPrefWidth(50);
+            pane.setPrefHeight(50);
             ImageView imageView = new ImageView(Images.getSoldierImage(soldier.getSoldier().getINDEX()));
             imageView.setPreserveRatio(false); // Сохранять пропорции
             imageView.setSmooth(true);  // Сглаживание изображения
             imageView.setCache(true); // Кэширование изображения
             imageView.setFitWidth(50);
             imageView.setFitHeight(50);
+            pane.getChildren().add(imageView);
+            String having = BoardSingleton.getInstance().isMySoldier(soldier.getIndex()) ? "You" : "Op";
 
-            hBox.getChildren().add(imageView);
+            hBox.getChildren().add(pane);
 
             VBox vBox = new VBox();
             vBox.setSpacing(10);
 
             ProgressBar progressBar = new ProgressBar(1);
+            if(having.equals("You")){
             progressBar.setStyle(
-                    "-fx-accent: red; " +  // Зеленый цвет прогресса
+                    "-fx-accent: blue; " +  // Зеленый цвет прогресса
                             "-fx-background-color: grey; " + // Светло-серый фон
                             "-fx-border-color: #ccc; " + // Серая граница
                             "-fx-border-width: 1px; " +
                             "-fx-border-radius: 5px; "
             );
+            }
+            else{
+                progressBar.setStyle(
+                        "-fx-accent: red; " +  // Зеленый цвет прогресса
+                                "-fx-background-color: grey; " + // Светло-серый фон
+                                "-fx-border-color: #ccc; " + // Серая граница
+                                "-fx-border-width: 1px; " +
+                                "-fx-border-radius: 5px; "
+                );
+            }
             progressBar.setMaxWidth(150);
             progressBar.setPrefWidth(150);
             progressBar.setMinWidth(150);
             map.put(soldier.getIndex(), progressBar);
-            Label label = new Label(soldier.getIndex() + " " + nameSoldier(soldier.getSoldier()));
+            Label label = new Label(soldier.getIndex()
+                    + " "
+                    + nameSoldier(soldier.getSoldier())
+                    + " (" + having + ")");
             MyStyle style = new MyStyle();
             EventHandler<MouseEvent> click = event -> {
                 if (hod) {
@@ -200,7 +235,7 @@ public class BattleController {
             };
             label.setOnMouseClicked(click);
             progressBar.setOnMouseClicked(click);
-            imageView.setOnMouseClicked(click);
+            pane.setOnMouseClicked(click);
             EventHandler<MouseEvent> mouseEntered = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), true, style);
@@ -212,7 +247,7 @@ public class BattleController {
 
             label.setOnMouseEntered(mouseEntered);
             progressBar.setOnMouseEntered(mouseEntered);
-            imageView.setOnMouseEntered(mouseEntered);
+            pane.setOnMouseEntered(mouseEntered);
             EventHandler<MouseEvent> mouseExited = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), false, style);
@@ -224,7 +259,7 @@ public class BattleController {
 
             label.setOnMouseExited(mouseExited);
             progressBar.setOnMouseExited(mouseExited);
-            imageView.setOnMouseExited(mouseExited);
+            pane.setOnMouseExited(mouseExited);
 
             vBox.getChildren().add(label);
             vBox.getChildren().add(progressBar);

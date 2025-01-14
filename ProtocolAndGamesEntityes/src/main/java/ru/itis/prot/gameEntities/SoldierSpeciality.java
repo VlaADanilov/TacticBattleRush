@@ -53,4 +53,11 @@ public class SoldierSpeciality {
         }
         return "WTF";
     }
+
+    public static boolean indexInRight(AbstractSoldier soldier){
+        if(soldier instanceof HeavyKnight || soldier instanceof Archer){
+            return true;
+        }
+        return false;
+    }
 }

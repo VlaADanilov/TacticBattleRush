@@ -187,6 +187,7 @@ public class SetUnitController {
         horseKnightImage.setDisable(true);
         horseKnightImage.setOpacity(0);
         cntOfUnits.setOpacity(0);
+        submitButton.setDisable(true);
 
         service = new MyService();
 
