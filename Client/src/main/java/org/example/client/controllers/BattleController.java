@@ -141,6 +141,20 @@ public class BattleController {
 
     private void addHealthBars(List<SoldierWithIndexAndCoordinats> soldiers) {
         for (SoldierWithIndexAndCoordinats soldier : soldiers) {
+            HBox hBox = new HBox();
+            hBox.setSpacing(10);
+            ImageView imageView = new ImageView(Images.getSoldierImage(soldier.getSoldier().getINDEX()));
+            imageView.setPreserveRatio(false); // Сохранять пропорции
+            imageView.setSmooth(true);  // Сглаживание изображения
+            imageView.setCache(true); // Кэширование изображения
+            imageView.setFitWidth(50);
+            imageView.setFitHeight(50);
+
+            hBox.getChildren().add(imageView);
+
+            VBox vBox = new VBox();
+            vBox.setSpacing(10);
+
             ProgressBar progressBar = new ProgressBar(1);
             progressBar.setStyle(
                     "-fx-accent: red; " +  // Зеленый цвет прогресса
@@ -149,8 +163,8 @@ public class BattleController {
                             "-fx-border-width: 1px; " +
                             "-fx-border-radius: 5px; "
             );
-            progressBar.setMaxWidth(200);
-            progressBar.setPrefWidth(200);
+            progressBar.setMaxWidth(150);
+            progressBar.setPrefWidth(150);
             map.put(soldier.getIndex(), progressBar);
             Label label = new Label(soldier.getIndex() + " " + nameSoldier(soldier.getSoldier()));
             MyStyle style = new MyStyle();
@@ -181,6 +195,7 @@ public class BattleController {
             };
             label.setOnMouseClicked(click);
             progressBar.setOnMouseClicked(click);
+            imageView.setOnMouseClicked(click);
             EventHandler<MouseEvent> mouseEntered = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), true, style);
@@ -192,6 +207,7 @@ public class BattleController {
 
             label.setOnMouseEntered(mouseEntered);
             progressBar.setOnMouseEntered(mouseEntered);
+            imageView.setOnMouseEntered(mouseEntered);
             EventHandler<MouseEvent> mouseExited = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), false, style);
@@ -203,8 +219,12 @@ public class BattleController {
 
             label.setOnMouseExited(mouseExited);
             progressBar.setOnMouseExited(mouseExited);
-            healthBox.getChildren().add(label);
-            healthBox.getChildren().add(progressBar);
+            imageView.setOnMouseExited(mouseExited);
+
+            vBox.getChildren().add(label);
+            vBox.getChildren().add(progressBar);
+            hBox.getChildren().add(vBox);
+            healthBox.getChildren().add(hBox);
         }
     }
 

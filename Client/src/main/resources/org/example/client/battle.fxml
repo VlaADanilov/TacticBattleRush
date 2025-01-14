@@ -83,7 +83,7 @@
          </BorderPane.margin>
          <children>
              <Button maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" onAction="#aboutUnits" prefHeight="25.0" prefWidth="25.0" text="?" />
-            <VBox fx:id="healthBox" prefWidth="100.0" />
+            <VBox fx:id="healthBox" alignment="TOP_CENTER" prefWidth="100.0" />
             <Label fx:id="hodLabel">
                <font>
                   <Font size="15.0" />
