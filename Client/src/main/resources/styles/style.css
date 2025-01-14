@@ -53,3 +53,9 @@
 .my_button:pressed {
     -fx-background-color: #1F618D; /* Цвет фона при нажатии */
 }
+.scroll-pane{
+    -fx-background-color:transparent;
+}
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}

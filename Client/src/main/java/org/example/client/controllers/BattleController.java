@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -37,6 +38,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class BattleController {
+    @FXML
+    private ScrollPane scrollable;
     @FXML
     private TextArea historyTextArea;
     @FXML
@@ -140,6 +143,7 @@ public class BattleController {
     }
 
     private void addHealthBars(List<SoldierWithIndexAndCoordinats> soldiers) {
+        healthBox.setStyle("-fx-background-color: transparent");
         for (SoldierWithIndexAndCoordinats soldier : soldiers) {
             HBox hBox = new HBox();
             hBox.setSpacing(10);
@@ -165,6 +169,7 @@ public class BattleController {
             );
             progressBar.setMaxWidth(150);
             progressBar.setPrefWidth(150);
+            progressBar.setMinWidth(150);
             map.put(soldier.getIndex(), progressBar);
             Label label = new Label(soldier.getIndex() + " " + nameSoldier(soldier.getSoldier()));
             MyStyle style = new MyStyle();
