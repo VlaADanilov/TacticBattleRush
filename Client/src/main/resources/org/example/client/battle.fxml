@@ -87,7 +87,7 @@
          </BorderPane.margin>
          <children>
              <Button maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" onAction="#aboutUnits" prefHeight="25.0" prefWidth="25.0" text="?" />
-            <ScrollPane fx:id="scrollable" maxHeight="400.0" minWidth="250" prefWidth="250.0" styleClass="scroll-pane">
+            <ScrollPane maxHeight="350.0" minWidth="250" prefWidth="250.0" styleClass="scroll-pane">
                <content>
                   <VBox fx:id="healthBox" alignment="TOP_CENTER" prefWidth="100.0" />
                </content>

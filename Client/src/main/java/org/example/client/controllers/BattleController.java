@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -66,9 +67,23 @@ public class BattleController {
         GridPane.setHgrow(gridPane, Priority.ALWAYS);
         GridPane.setVgrow(gridPane, Priority.ALWAYS);
 
+        VBox vBox1 = new VBox();
+        vBox1.setSpacing(3);
         leftSword = new SwordAnimPane(true);
+        leftSword.setMinSize(36,50);
+        Label lab1 = new Label("You");
+        VBox.setMargin(lab1, new Insets(0,0,0,7));
+        lab1.setStyle("-fx-font-weight: bold;");
+        vBox1.getChildren().addAll(leftSword,lab1);
+        VBox vBox2 = new VBox();
+        vBox2.setSpacing(3);
         rightSword = new SwordAnimPane(false);
-        swords.getChildren().addAll(leftSword, rightSword);
+        rightSword.setMinSize(36,50);
+        Label label2 = new Label("Op");
+        VBox.setMargin(label2, new Insets(0,0,0,7));
+        label2.setStyle("-fx-font-weight: bold;");
+        vBox2.getChildren().addAll(rightSword,label2);
+        swords.getChildren().addAll(vBox1, vBox2);
 
         myService = getMyService();
         hod = BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getLastMessage().getData()) == 1;
@@ -408,16 +423,16 @@ public class BattleController {
 
     private void action(Player player, int attacker, int defender) {
         addHistory(player, attacker, defender);
-        SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().action(attacker, defender);
-        map.get(defender).setProgress(
-                soldier.getSoldier().getHealth() / (soldier.getSoldier().getMAXHEALTH() + 0d)
-        );
         if(BoardSingleton.getInstance().isMySoldier(attacker) && BoardSingleton.getInstance().isOpponentSoldier(defender)){
             leftSword.startAnim();
         }
         if (BoardSingleton.getInstance().isOpponentSoldier(attacker) && BoardSingleton.getInstance().isMySoldier(defender)) {
             rightSword.startAnim();
         }
+        SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().action(attacker, defender);
+        map.get(defender).setProgress(
+                soldier.getSoldier().getHealth() / (soldier.getSoldier().getMAXHEALTH() + 0d)
+        );
         if (soldier.getSoldier().getHealth() == 0) {
             Pane pane = (Pane) gridPane.getChildren().stream()
                     .filter((entity) -> Objects.equals(GridPane.getColumnIndex(entity), soldier.getCol()) &&
