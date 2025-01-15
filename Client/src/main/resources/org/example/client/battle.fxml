@@ -92,9 +92,10 @@
                   <VBox fx:id="healthBox" alignment="TOP_CENTER" prefWidth="100.0" />
                </content>
             </ScrollPane>
-            <HBox spacing="30.0">
+            <HBox spacing="10.0">
                <children>
                   <BellAnimPane fx:id="bell" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" prefHeight="30.0" prefWidth="30.0" />
+                   <Pane fx:id="changer" minWidth="7" minHeight="7" prefWidth="7" prefHeight="7" maxHeight="7" maxWidth="7"/>
                   <Label fx:id="hodLabel">
                      <font>
                         <Font size="15.0" />

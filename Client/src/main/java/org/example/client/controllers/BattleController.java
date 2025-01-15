@@ -42,6 +42,8 @@ import java.util.*;
 
 public class BattleController {
     @FXML
+    private Pane changer;
+    @FXML
     private HBox swords;
     @FXML
     private BellAnimPane bell;
@@ -84,6 +86,15 @@ public class BattleController {
         label2.setStyle("-fx-font-weight: bold;");
         vBox2.getChildren().addAll(rightSword,label2);
         swords.getChildren().addAll(vBox1, vBox2);
+
+        changer.setStyle("-fx-background-color: green");
+        changer.setOnMouseClicked((event) -> {
+            if(bell.changeSoundFlag()){
+                changer.setStyle("-fx-background-color: green");
+            }else{
+                changer.setStyle("-fx-background-color: red");
+            }
+        });
 
         myService = getMyService();
         hod = BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getLastMessage().getData()) == 1;

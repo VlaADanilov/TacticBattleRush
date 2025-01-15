@@ -16,11 +16,13 @@ import javax.sound.sampled.Clip;
 import java.io.BufferedInputStream;
 import java.io.File;
 
+
 public class BellAnimPane extends AbstractAnimatedPane {
     private Timeline timeline;
+    private boolean flag;
     public BellAnimPane() {
         super(new Image(Images.class.getResourceAsStream("/image/колокол.png")));
-
+        flag = true;
         Rotate rotate = new Rotate(0, imageView.getFitWidth() / 2, 0); // Вращение вокруг верхней средней точки
         imageView.getTransforms().add(rotate);
         // Анимация звона
@@ -37,7 +39,9 @@ public class BellAnimPane extends AbstractAnimatedPane {
 
     @Override
     public void startAnim() {
-        playSound();
+        if(flag){
+            playSound();
+        }
         timeline.play();
     }
 
@@ -49,5 +53,10 @@ public class BellAnimPane extends AbstractAnimatedPane {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean changeSoundFlag(){
+        flag = !flag;
+        return flag;
     }
 }
