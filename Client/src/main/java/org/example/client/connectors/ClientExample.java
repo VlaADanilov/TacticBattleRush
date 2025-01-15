@@ -1,7 +1,7 @@
 package org.example.client.connectors;
 
 
-import org.example.client.protocol.Message;
+import ru.itis.prot.protocol.Message;
 
 public interface ClientExample {
     void connect();

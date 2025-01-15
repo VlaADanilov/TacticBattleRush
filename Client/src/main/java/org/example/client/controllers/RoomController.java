@@ -6,14 +6,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import org.example.client.connectors.ClientImpl;
-import org.example.client.protocol.Message;
+import ru.itis.prot.protocol.Message;
 import org.example.client.HelloApplication;
 import org.example.client.service.MessageWaitingService;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class RoomController {
     @FXML

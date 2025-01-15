@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="600.0" prefWidth="250.0" styleClass="main-menu" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.InfoController">
+   <children>
+      <VBox fx:id="box" prefWidth="300.0">
+         <StackPane.margin>
+            <Insets top="25.0" />
+         </StackPane.margin></VBox>
+   </children>
+</StackPane>

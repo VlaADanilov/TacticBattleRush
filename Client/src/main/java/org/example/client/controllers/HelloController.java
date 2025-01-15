@@ -6,9 +6,8 @@ import javafx.scene.control.TextField;
 import org.example.client.HelloApplication;
 import org.example.client.connectors.ClientExample;
 import org.example.client.connectors.ClientImpl;
-import org.example.client.protocol.Message;
-import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
-import org.example.client.protocol.exception.WrongMessageTypeException;
+import ru.itis.prot.protocol.Message;
+import ru.itis.prot.protocol.exception.*;
 
 import java.io.IOException;
 import java.net.InetAddress;

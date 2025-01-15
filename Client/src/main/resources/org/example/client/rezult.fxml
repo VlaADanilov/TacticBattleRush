@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane styleClass="main-menu" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.client.controllers.RezultController">
+    <bottom>
+        <Label text="DanilovProfGroup.com" textAlignment="CENTER" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="10.0" />
+            </BorderPane.margin>
+            <font>
+                <Font size="10.0" />
+            </font>
+        </Label>
+    </bottom>
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-alignment: center;" BorderPane.alignment="CENTER">
+            <children>
+            <ImageView fx:id="rezultImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                <Button fx:id="exitButton" mnemonicParsing="false" onMouseClicked="#exit" styleClass="my_button" text="Exit">
+                    <VBox.margin>
+                        <Insets top="25.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="50.0" left="200.0" right="200.0" top="50.0" />
+            </BorderPane.margin>
+        </VBox>
+    </center>
+    <top>
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="game-title" text="Tactic Battle Rush" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets top="75.0" />
+            </BorderPane.margin>
+        </Text>
+    </top>
+</BorderPane>

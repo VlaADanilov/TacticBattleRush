@@ -1,27 +1,25 @@
 package org.example.client.controllers;
 
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import org.example.client.GameEntities.AbstractEntity;
-import org.example.client.GameEntities.elements.AbstractElement;
-import org.example.client.GameEntities.fabrica.ElementFabrica;
-import org.example.client.GameEntities.fabrica.SoldierFabrica;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+import org.example.client.InfoApplication;
+import ru.itis.prot.gameEntities.fabrica.*;
+import ru.itis.prot.gameEntities.elements.*;
+import ru.itis.prot.protocol.Message;
+import ru.itis.prot.protocol.exception.*;
 import org.example.client.HelloApplication;
 import org.example.client.board.BoardSingleton;
 import org.example.client.connectors.ClientImpl;
-import org.example.client.protocol.Message;
-import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
-import org.example.client.protocol.exception.WrongMessageTypeException;
+
 import org.example.client.util.Images;
 
 
@@ -47,6 +45,7 @@ public class SetUnitController {
     @FXML
     private Button submitButton;
 
+
     private int needCount = 0;
 
     private int cnt = 0;
@@ -54,6 +53,12 @@ public class SetUnitController {
     private int choice;
 
     public void initialize() {
+
+
+
+        GridPane.setHgrow(gridPane, Priority.ALWAYS);
+        GridPane.setVgrow(gridPane, Priority.ALWAYS);
+
         heavyKnightImage.setImage(Images.getSoldierImage(1));
         archerImage.setImage(Images.getSoldierImage(2));
         hillerImage.setImage(Images.getSoldierImage(3));
@@ -79,8 +84,15 @@ public class SetUnitController {
             imageView.setImage(Images.getElementImage(element.getIndex()));
             gridPane.add(pane, arr[i],arr[i+1]);
 
-            imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
-            imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
+            imageView.setPreserveRatio(false); // Сохранять пропорции
+            imageView.setSmooth(true);  // Сглаживание изображения
+            imageView.setCache(true); // Кэширование изображения
+
+            imageView.fitWidthProperty().bind(pane.widthProperty());
+            imageView.fitHeightProperty().bind(pane.heightProperty());
+//            imageView.setFitHeight(gridPane.getMinHeight() / gridPane.getRowCount());
+//            imageView.setFitWidth(gridPane.getMinWidth() / gridPane.getColumnCount());
+
             pane.getChildren().add(imageView);
         }
 
@@ -107,8 +119,12 @@ public class SetUnitController {
                             if (choice != 0 && cnt < needCount && BoardSingleton.getInstance().checkForNull(finalJ, finalI)) {
                                 BoardSingleton.getInstance().addMySoldier(SoldierFabrica.getSoldier(choice), finalJ, finalI);
                                 ImageView imageView = new ImageView(Images.getSoldierImage(choice));
-                                imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
-                                imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
+                                imageView.setPreserveRatio(false); // Сохранять пропорции
+                                imageView.setSmooth(true);  // Сглаживание изображения
+                                imageView.setCache(true); // Кэширование изображения
+
+                                imageView.fitWidthProperty().bind(pane.widthProperty());
+                                imageView.fitHeightProperty().bind(pane.heightProperty());
                                 pane.getChildren().add(imageView);
                                 cnt++;
                                 if (cnt == needCount) {
@@ -171,6 +187,7 @@ public class SetUnitController {
         horseKnightImage.setDisable(true);
         horseKnightImage.setOpacity(0);
         cntOfUnits.setOpacity(0);
+        submitButton.setDisable(true);
 
         service = new MyService();
 
@@ -205,6 +222,16 @@ public class SetUnitController {
         allOpacity(0.5d);
         choice = 5;
         mortarImage.setOpacity(1);
+    }
+
+    public void aboutUnits(ActionEvent actionEvent) {
+        Platform.runLater(() -> {
+            try {
+                new InfoApplication().start(new Stage());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static class MyService extends Service<Boolean> {

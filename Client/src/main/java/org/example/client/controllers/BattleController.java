@@ -1,38 +1,52 @@
 package org.example.client.controllers;
 
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import javafx.util.Pair;
-import org.example.client.GameEntities.AbstractEntity;
-import org.example.client.GameEntities.elements.AbstractElement;
-import org.example.client.GameEntities.soldiers.*;
 import org.example.client.HelloApplication;
+import org.example.client.InfoApplication;
+import org.example.client.animaitedPanes.BellAnimPane;
+import org.example.client.animaitedPanes.SwordAnimPane;
 import org.example.client.board.BoardSingleton;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 import org.example.client.connectors.ClientImpl;
-import org.example.client.protocol.Message;
-import org.example.client.protocol.exception.ExceedingTheMaximumLengthException;
-import org.example.client.protocol.exception.WrongMessageTypeException;
 import org.example.client.util.Images;
 import org.example.client.util.MyStyle;
 import org.example.client.util.Player;
-import org.example.client.util.SoldierSpeciality;
+import org.example.client.util.WhoWinner;
+import ru.itis.prot.gameEntities.SoldierSpeciality;
+import ru.itis.prot.gameEntities.AbstractEntity;
+import ru.itis.prot.gameEntities.soldiers.*;
+import ru.itis.prot.gameEntities.elements.*;
+import ru.itis.prot.protocol.Message;
+import ru.itis.prot.protocol.exception.*;
 
 import java.io.IOException;
 import java.util.*;
 
 public class BattleController {
+    @FXML
+    private Pane changer;
+    @FXML
+    private HBox swords;
+    @FXML
+    private BellAnimPane bell;
     @FXML
     private TextArea historyTextArea;
     @FXML
@@ -48,7 +62,40 @@ public class BattleController {
     private byte[] array;
     private static final String BOARD_COLOR = "#38FF25FF";
 
+    private SwordAnimPane leftSword;
+    private SwordAnimPane rightSword;
+
     public void initialize() {
+        GridPane.setHgrow(gridPane, Priority.ALWAYS);
+        GridPane.setVgrow(gridPane, Priority.ALWAYS);
+
+        VBox vBox1 = new VBox();
+        vBox1.setSpacing(3);
+        leftSword = new SwordAnimPane(true);
+        leftSword.setMinSize(36,50);
+        Label lab1 = new Label("You");
+        VBox.setMargin(lab1, new Insets(0,0,0,7));
+        lab1.setStyle("-fx-font-weight: bold;");
+        vBox1.getChildren().addAll(leftSword,lab1);
+        VBox vBox2 = new VBox();
+        vBox2.setSpacing(3);
+        rightSword = new SwordAnimPane(false);
+        rightSword.setMinSize(36,50);
+        Label label2 = new Label("Op");
+        VBox.setMargin(label2, new Insets(0,0,0,7));
+        label2.setStyle("-fx-font-weight: bold;");
+        vBox2.getChildren().addAll(rightSword,label2);
+        swords.getChildren().addAll(vBox1, vBox2);
+
+        changer.setStyle("-fx-background-color: green");
+        changer.setOnMouseClicked((event) -> {
+            if(bell.changeSoundFlag()){
+                changer.setStyle("-fx-background-color: green");
+            }else{
+                changer.setStyle("-fx-background-color: red");
+            }
+        });
+
         myService = getMyService();
         hod = BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getLastMessage().getData()) == 1;
         AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
@@ -56,7 +103,17 @@ public class BattleController {
             for (int x = 0; x < gridPane.getRowCount(); x++) {
                 AbstractEntity entity = board[x][y];
                 Pane pane = new Pane();
-                pane.setStyle("-fx-background-color: %s;-fx-border-color: black;".formatted(BOARD_COLOR));
+                pane.setBackground(new Background(new BackgroundImage(
+                        Images.getGrassImage(),
+                        BackgroundRepeat.NO_REPEAT,
+                        BackgroundRepeat.NO_REPEAT,
+                        BackgroundPosition.CENTER,
+                        new BackgroundSize(
+                                0,0,
+                                true,true,true,true
+                        )
+                        )));
+                pane.setStyle("-fx-border-color: black");
                 if (entity == null) {
                     gridPane.add(pane, y, x);
                 } else {
@@ -66,27 +123,42 @@ public class BattleController {
                         );
 
 
-                        imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
-                        imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
+                        imageView.setPreserveRatio(false); // Сохранять пропорции
+                        imageView.setSmooth(true);  // Сглаживание изображения
+                        imageView.setCache(true); // Кэширование изображения
+
+                        imageView.fitWidthProperty().bind(pane.widthProperty());
+                        imageView.fitHeightProperty().bind(pane.heightProperty());
+
                         pane.getChildren().add(imageView);
                         gridPane.add(pane, y, x);
                     } else {
-                        if (entity instanceof AbstractSoldier) {
+                        if (entity instanceof AbstractSoldier soldier) {
                             ImageView imageView = new ImageView(
                                     Images.getSoldierImage(((AbstractSoldier) entity).getINDEX())
                             );
 
-
-                            AbstractSoldier soldier = (AbstractSoldier) entity;
                             if (BoardSingleton.getInstance().isMySoldier(soldier)) {
                                 pane.setStyle("-fx-background-color: blue");
                             } else {
                                 pane.setStyle("-fx-background-color: red");
                             }
 
-                            imageView.setFitHeight(gridPane.getMaxHeight() / gridPane.getRowCount());
-                            imageView.setFitWidth(gridPane.getMaxWidth() / gridPane.getColumnCount());
+                            imageView.setPreserveRatio(false); // Сохранять пропорции
+                            imageView.setSmooth(true);  // Сглаживание изображения
+                            imageView.setCache(true); // Кэширование изображения
+
+                            imageView.fitWidthProperty().bind(pane.widthProperty());
+                            imageView.fitHeightProperty().bind(pane.heightProperty());
                             pane.getChildren().add(imageView);
+
+                            SoldierWithIndexAndCoordinats sold = BoardSingleton.getInstance().getSoldier(y, x);
+                            Label label = new Label(String.valueOf(sold.getIndex()));
+                            label.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+                            pane.getChildren().add(label);
+                            if(SoldierSpeciality.indexInRight(soldier)){
+                                bindLabelToRightTop(label, pane);
+                            }
                             gridPane.add(pane, y, x);
                         }
                     }
@@ -112,64 +184,123 @@ public class BattleController {
         }
     }
 
+    private void bindLabelToRightTop(Label label, Pane pane){
+        // Привязка координаты X к правой границе Pane
+        label.layoutXProperty().bind(pane.widthProperty().subtract(label.widthProperty()));
+
+        // Привязка координаты Y к верхней границе Pane (0)
+        label.layoutYProperty().set(0);
+    }
+
     private void addHealthBars(List<SoldierWithIndexAndCoordinats> soldiers) {
+        healthBox.setStyle("-fx-background-color: transparent");
         for (SoldierWithIndexAndCoordinats soldier : soldiers) {
+            HBox hBox = new HBox();
+            hBox.setSpacing(10);
+            Pane pane = new Pane();
+            pane.setMinWidth(50);
+            pane.setMinHeight(50);
+            pane.setPrefWidth(50);
+            pane.setPrefHeight(50);
+            ImageView imageView = new ImageView(Images.getSoldierImage(soldier.getSoldier().getINDEX()));
+            imageView.setPreserveRatio(false); // Сохранять пропорции
+            imageView.setSmooth(true);  // Сглаживание изображения
+            imageView.setCache(true); // Кэширование изображения
+            imageView.setFitWidth(50);
+            imageView.setFitHeight(50);
+            pane.getChildren().add(imageView);
+            String having = BoardSingleton.getInstance().isMySoldier(soldier.getIndex()) ? "You" : "Op";
+
+            hBox.getChildren().add(pane);
+
+            VBox vBox = new VBox();
+            vBox.setSpacing(10);
+
             ProgressBar progressBar = new ProgressBar(1);
+            if(having.equals("You")){
             progressBar.setStyle(
-                    "-fx-accent: red; " +  // Зеленый цвет прогресса
+                    "-fx-accent: blue; " +  // Зеленый цвет прогресса
                             "-fx-background-color: grey; " + // Светло-серый фон
                             "-fx-border-color: #ccc; " + // Серая граница
                             "-fx-border-width: 1px; " +
                             "-fx-border-radius: 5px; "
             );
-            progressBar.setMaxWidth(200);
-            progressBar.setPrefWidth(200);
+            }
+            else{
+                progressBar.setStyle(
+                        "-fx-accent: red; " +  // Зеленый цвет прогресса
+                                "-fx-background-color: grey; " + // Светло-серый фон
+                                "-fx-border-color: #ccc; " + // Серая граница
+                                "-fx-border-width: 1px; " +
+                                "-fx-border-radius: 5px; "
+                );
+            }
+            progressBar.setMaxWidth(150);
+            progressBar.setPrefWidth(150);
+            progressBar.setMinWidth(150);
             map.put(soldier.getIndex(), progressBar);
-            Label label = new Label(soldier.getIndex() + " " + nameSoldier(soldier.getSoldier()));
+            Label label = new Label(soldier.getIndex()
+                    + " "
+                    + nameSoldier(soldier.getSoldier())
+                    + " (" + having + ")");
             MyStyle style = new MyStyle();
-            label.setOnMouseClicked((event -> {
+            EventHandler<MouseEvent> click = event -> {
                 if (hod) {
                     if (BoardSingleton.getInstance().isMySoldier(soldier.getIndex())) {
                         if (choice == 0) {
                             choice = soldier.getIndex();
-                            editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
+                            editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), "grey");
                             editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), true);
                         } else {
                             if (choice != soldier.getIndex()) {
                                 SoldierWithIndexAndCoordinats tempSold = BoardSingleton.getInstance().getMySoldierByIndex(choice);
-                                editBoardByDoingMovementSet(tempSold.getCol(), tempSold.getRow(), tempSold.getSoldier().getMovementradius(), BOARD_COLOR);
+                                editBoardByDoingMovementSet(tempSold.getCol(), tempSold.getRow(), BOARD_COLOR);
                                 editBoardByDoingAttackSet(tempSold.getCol(), tempSold.getRow(), false);
                                 style.setStyle("-fx-background-color: blue");
                                 choice = soldier.getIndex();
-                                editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), "grey");
+                                editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), "grey");
                                 editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), true);
                                 return;
                             }
                             choice = 0;
-                            editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), soldier.getSoldier().getMovementradius(), BOARD_COLOR);
+                            editBoardByDoingMovementSet(soldier.getCol(), soldier.getRow(), BOARD_COLOR);
                             editBoardByDoingAttackSet(soldier.getCol(), soldier.getRow(), false);
                         }
                     }
                 }
-            }));
-            label.setOnMouseEntered((event -> {
+            };
+            label.setOnMouseClicked(click);
+            progressBar.setOnMouseClicked(click);
+            pane.setOnMouseClicked(click);
+            EventHandler<MouseEvent> mouseEntered = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), true, style);
                 }
                 if (BoardSingleton.getInstance().isMySoldier(soldier.getIndex())) {
                     editBoardByChoicingMy(soldier.getCol(), soldier.getRow(), true, style);
                 }
-            }));
-            label.setOnMouseExited((event -> {
+            };
+
+            label.setOnMouseEntered(mouseEntered);
+            progressBar.setOnMouseEntered(mouseEntered);
+            pane.setOnMouseEntered(mouseEntered);
+            EventHandler<MouseEvent> mouseExited = event -> {
                 if (BoardSingleton.getInstance().isOpponentSoldier(soldier.getIndex())) {
                     editBoardByChoicingOpponent(soldier.getCol(), soldier.getRow(), false, style);
                 }
                 if (BoardSingleton.getInstance().isMySoldier(soldier.getIndex())) {
                     editBoardByChoicingMy(soldier.getCol(), soldier.getRow(), false, style);
                 }
-            }));
-            healthBox.getChildren().add(label);
-            healthBox.getChildren().add(progressBar);
+            };
+
+            label.setOnMouseExited(mouseExited);
+            progressBar.setOnMouseExited(mouseExited);
+            pane.setOnMouseExited(mouseExited);
+
+            vBox.getChildren().add(label);
+            vBox.getChildren().add(progressBar);
+            hBox.getChildren().add(vBox);
+            healthBox.getChildren().add(hBox);
         }
     }
 
@@ -215,14 +346,14 @@ public class BattleController {
                     if (choice == 0) {
                         choice = soldier.getIndex();
 
-                        editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), "grey");
+                        editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), "grey");
                         editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), true);
                     } else {
                         if (choice != soldier.getIndex()) {
                             return;
                         }
                         choice = 0;
-                        editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), soldier.getSoldier().getMovementradius(), BOARD_COLOR);
+                        editBoardByDoingMovementSet(entry.getKey(), entry.getValue(), BOARD_COLOR);
                         editBoardByDoingAttackSet(entry.getKey(), entry.getValue(), false);
                     }
                 }
@@ -251,8 +382,7 @@ public class BattleController {
                         pane.setStyle("-fx-background-color: #CF4658FF");
                         pane.setOnMouseClicked((event) -> {
                             if (hod && choice != 0) {
-                                SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
-                                editBoardByDoingMovementSet(column, row, mySoldierByCoordinates.getSoldier().getMovementradius(), BOARD_COLOR);
+                                editBoardByDoingMovementSet(column, row, BOARD_COLOR);
                                 editBoardByDoingAttackSet(column, row, false);
                                 SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(pair.getValue(), pair.getKey());
                                 action(Player.You, choice, soldier.getIndex());
@@ -261,9 +391,7 @@ public class BattleController {
                                         ClientImpl.getInstance().sendMessage(
                                                 Message.createMessage(Message.TYPE_ATTACK, new byte[]{(byte) choice, (byte) soldier.getIndex()})
                                         );
-                                    } catch (ExceedingTheMaximumLengthException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (WrongMessageTypeException e) {
+                                    } catch (ExceedingTheMaximumLengthException | WrongMessageTypeException e) {
                                         throw new RuntimeException(e);
                                     }
                                 } else {
@@ -273,9 +401,7 @@ public class BattleController {
                                         ClientImpl.getInstance().sendMessage(
                                                 Message.createMessage(Message.TYPE_ATTACK_AND_MOVE, array)
                                         );
-                                    } catch (ExceedingTheMaximumLengthException e) {
-                                        throw new RuntimeException(e);
-                                    } catch (WrongMessageTypeException e) {
+                                    } catch (ExceedingTheMaximumLengthException | WrongMessageTypeException e) {
                                         throw new RuntimeException(e);
                                     }
                                 }
@@ -308,6 +434,12 @@ public class BattleController {
 
     private void action(Player player, int attacker, int defender) {
         addHistory(player, attacker, defender);
+        if(BoardSingleton.getInstance().isMySoldier(attacker) && BoardSingleton.getInstance().isOpponentSoldier(defender)){
+            leftSword.startAnim();
+        }
+        if (BoardSingleton.getInstance().isOpponentSoldier(attacker) && BoardSingleton.getInstance().isMySoldier(defender)) {
+            rightSword.startAnim();
+        }
         SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().action(attacker, defender);
         map.get(defender).setProgress(
                 soldier.getSoldier().getHealth() / (soldier.getSoldier().getMAXHEALTH() + 0d)
@@ -318,7 +450,17 @@ public class BattleController {
                             Objects.equals(GridPane.getRowIndex(entity), soldier.getRow())).findAny().orElseThrow();
             gridPane.getChildren().remove(pane);
             Pane newPane = new Pane();
-            newPane.setStyle("-fx-border-color: black; -fx-background-color: %s".formatted(BOARD_COLOR));
+            newPane.setBackground(new Background(new BackgroundImage(
+                    Images.getGrassImage(),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(
+                            0,0,
+                            true,true,true,true
+                    )
+            )));
+            newPane.setStyle("-fx-border-color: black");
             gridPane.add(newPane, soldier.getCol(), soldier.getRow());
         }
     }
@@ -348,14 +490,27 @@ public class BattleController {
         historyTextArea.appendText(string);
     }
 
-    private void editBoardByDoingMovementSet(Integer column, Integer row, int movementradius, String color) {
-        AbstractEntity[][] board = BoardSingleton.getInstance().getBoard();
+    private void editBoardByDoingMovementSet(Integer column, Integer row, String color) {
         SoldierWithIndexAndCoordinats soldier = BoardSingleton.getInstance().getSoldier(column, row);
         Set<Pair<Integer, Integer>> movementPositions = BoardSingleton.getInstance().getMovementPositions(soldier.getIndex());
         for (Pair<Integer, Integer> pair : movementPositions) {
             Pane pane = (Pane) gridPane.getChildren().stream()
                     .filter((ent) -> Objects.equals(GridPane.getColumnIndex(ent), pair.getValue()) && Objects.equals(GridPane.getRowIndex(ent), pair.getKey())).findAny().orElseThrow();
-            pane.setStyle("-fx-background-color: %s; -fx-border-color: black".formatted(color));
+            if(color.equals(BOARD_COLOR)){
+                pane.setBackground(new Background(new BackgroundImage(
+                        Images.getGrassImage(),
+                        BackgroundRepeat.NO_REPEAT,
+                        BackgroundRepeat.NO_REPEAT,
+                        BackgroundPosition.CENTER,
+                        new BackgroundSize(
+                                0,0,
+                                true,true,true,true
+                        )
+                )));
+                pane.setStyle("-fx-border-color: black");
+            }else {
+                pane.setStyle("-fx-background-color: %s; -fx-border-color: black".formatted(color));
+            }
             if (color.equals(BOARD_COLOR)) {
                 pane.setOnMouseClicked((event -> {
                 }));
@@ -366,7 +521,7 @@ public class BattleController {
                 pane.setOnMouseClicked((event -> {
                     if (hod && choice != 0) {
                         SoldierWithIndexAndCoordinats mySoldierByCoordinates = BoardSingleton.getInstance().getMySoldierByCoordinates(column, row);
-                        editBoardByDoingMovementSet(column, row, movementradius, BOARD_COLOR);
+                        editBoardByDoingMovementSet(column, row, BOARD_COLOR);
                         editBoardByDoingAttackSet(column, row, false);
                         move(Player.You, choice, pair.getValue(), pair.getKey());
                         int result = 0;
@@ -379,9 +534,7 @@ public class BattleController {
                                 ClientImpl.getInstance().sendMessage(
                                         Message.createMessage(Message.TYPE_MOVE, new byte[]{(byte) choice, (byte) retCol, (byte) retRow})
                                 );
-                            } catch (ExceedingTheMaximumLengthException e) {
-                                throw new RuntimeException(e);
-                            } catch (WrongMessageTypeException e) {
+                            } catch (ExceedingTheMaximumLengthException | WrongMessageTypeException e) {
                                 throw new RuntimeException(e);
                             }
                             choice = 0;
@@ -427,6 +580,7 @@ public class BattleController {
                         }
                     }
                 }
+                bell.startAnim();
                 hod = true;
                 hodLabel.setText("You are going");
                 editBoardByDoingMovement();
@@ -435,21 +589,20 @@ public class BattleController {
             } else {
                 //TODO нужна нормальная логика
                 if (message.getData()[0] == 1) {
-                    System.out.println("Ты выиграл");
+                    WhoWinner.setWinner(1);
                 } else {
-                    System.out.println("Ты проиграл");
+                    WhoWinner.setWinner(0);
                 }
                 BoardSingleton.getInstance().clear();
                 ClientImpl.getInstance().disconnect();
                 try {
-                    HelloApplication.changeScene("hello-view.fxml");
+                    HelloApplication.changeScene("rezult.fxml");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
             }
         }));
-        myService.setOnFailed((event2) -> myService.getException().printStackTrace());
         return myService;
     }
 
@@ -478,22 +631,17 @@ public class BattleController {
     }
 
     private String nameSoldier(AbstractSoldier soldier) {
-        if (soldier instanceof HeavyKnight) {
-            return "Heavy knight";
-        }
-        if (soldier instanceof Archer) {
-            return "Archer";
-        }
-        if (soldier instanceof Hiller) {
-            return "Hiller";
-        }
-        if (soldier instanceof HorseKnight) {
-            return "Horse knight";
-        }
-        if(soldier instanceof Mortar){
-            return "Mortar";
-        }
-        return "WTF";
+        return SoldierSpeciality.nameSoldier(soldier);
+    }
+
+    public void aboutUnits(ActionEvent actionEvent) {
+        Platform.runLater(() -> {
+            try {
+                new InfoApplication().start(new Stage());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static class MyService extends Service<Boolean> {

@@ -3,7 +3,7 @@ package org.example.client.service;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import org.example.client.connectors.ClientImpl;
-import org.example.client.protocol.Message;
+import ru.itis.prot.protocol.Message;
 
 
 public class MessageWaitingService extends Service<Boolean> {
