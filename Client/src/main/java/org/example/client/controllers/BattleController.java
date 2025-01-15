@@ -21,6 +21,7 @@ import javafx.util.Pair;
 import org.example.client.HelloApplication;
 import org.example.client.InfoApplication;
 import org.example.client.animaitedPanes.BellAnimPane;
+import org.example.client.animaitedPanes.SwordAnimPane;
 import org.example.client.board.BoardSingleton;
 import org.example.client.board.tools.SoldierWithIndexAndCoordinats;
 import org.example.client.connectors.ClientImpl;
@@ -40,9 +41,9 @@ import java.util.*;
 
 public class BattleController {
     @FXML
-    private BellAnimPane bell;
+    private HBox swords;
     @FXML
-    private ScrollPane scrollable;
+    private BellAnimPane bell;
     @FXML
     private TextArea historyTextArea;
     @FXML
@@ -58,9 +59,16 @@ public class BattleController {
     private byte[] array;
     private static final String BOARD_COLOR = "#38FF25FF";
 
+    private SwordAnimPane leftSword;
+    private SwordAnimPane rightSword;
+
     public void initialize() {
         GridPane.setHgrow(gridPane, Priority.ALWAYS);
         GridPane.setVgrow(gridPane, Priority.ALWAYS);
+
+        leftSword = new SwordAnimPane(true);
+        rightSword = new SwordAnimPane(false);
+        swords.getChildren().addAll(leftSword, rightSword);
 
         myService = getMyService();
         hod = BoardSingleton.getInstance().readCoordinateMessage(ClientImpl.getInstance().getLastMessage().getData()) == 1;
@@ -404,6 +412,12 @@ public class BattleController {
         map.get(defender).setProgress(
                 soldier.getSoldier().getHealth() / (soldier.getSoldier().getMAXHEALTH() + 0d)
         );
+        if(BoardSingleton.getInstance().isMySoldier(attacker) && BoardSingleton.getInstance().isOpponentSoldier(defender)){
+            leftSword.startAnim();
+        }
+        if (BoardSingleton.getInstance().isOpponentSoldier(attacker) && BoardSingleton.getInstance().isMySoldier(defender)) {
+            rightSword.startAnim();
+        }
         if (soldier.getSoldier().getHealth() == 0) {
             Pane pane = (Pane) gridPane.getChildren().stream()
                     .filter((entity) -> Objects.equals(GridPane.getColumnIndex(entity), soldier.getCol()) &&

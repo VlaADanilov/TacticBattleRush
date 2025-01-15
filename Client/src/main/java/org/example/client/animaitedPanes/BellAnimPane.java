@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 
 public class BellAnimPane extends AbstractAnimatedPane {
+    private Timeline timeline;
     public BellAnimPane() {
         super(new Image(Images.class.getResourceAsStream("/image/колокол.png")));
 

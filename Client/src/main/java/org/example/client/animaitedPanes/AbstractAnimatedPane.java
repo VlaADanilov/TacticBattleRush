@@ -8,7 +8,6 @@ import javafx.scene.layout.Pane;
 public abstract class AbstractAnimatedPane extends Pane {
 
     protected ImageView imageView;
-    protected Timeline timeline;
 
     public AbstractAnimatedPane(Image image) {
         this.imageView = new ImageView(image);

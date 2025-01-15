@@ -81,7 +81,7 @@
       </GridPane>
    </center>
    <left>
-      <VBox prefHeight="542.0" prefWidth="216.0" BorderPane.alignment="CENTER">
+      <VBox spacing="10" prefHeight="542.0" prefWidth="216.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets left="20.0" />
          </BorderPane.margin>
@@ -102,6 +102,9 @@
                   </Label>
                </children>
             </HBox>
+             <HBox fx:id="swords" spacing="40">
+
+             </HBox>
             <TextArea fx:id="historyTextArea" editable="false" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" wrapText="true" />
          </children>
       </VBox>
